@@ -1,0 +1,6 @@
+{
+  "name": "Kilmati - احجز كلمتك",
+  "description": "ديوان كِلْمَتِي (Kilmati) - منصة عربية لحجز وامتلاك الكلمات العربية الرمزية وتوليد شهادات فخمة بالذكاء الاصطناعي",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

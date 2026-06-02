@@ -1,0 +1,29 @@
+{
+  "entities": {
+    "WordRecord": {
+      "title": "WordRecord",
+      "description": "سجل الكلمة والمخرجات الوجدانية والأدبية المولدة لها بالذكاء الاصطناعي",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "المعرف الخاص بالسجل" },
+        "word": { "type": "string", "description": "الكلمة العربية الفصيحة المحجوزة" },
+        "owner": { "type": "string", "description": "كامل اسم مالك الكلمة" },
+        "ownerEmail": { "type": "string", "format": "email", "description": "البريد الإلكتروني لمالك الكلمة" },
+        "isGift": { "type": "boolean", "description": "ما إن كانت الكلمة محجوزة على سبيل الإهداء لآخر" },
+        "giftMessage": { "type": "string", "description": "الرسالة العاطفية المرفقة بالإهداء" },
+        "theme": { "type": "string", "enum": ["gold", "emerald", "onyx", "sapphire", "ruby"], "description": "النمط الجمالي للشهادة الرقمية" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "طابع وقت حجز الكلمة وتوثيقها" },
+        "quote": { "type": "string", "description": "البيت الشعري المأثور أو المقولة البيلغة للكلمة" },
+        "meaning": { "type": "string", "description": "المعنى البلاغي والأدبي الباذخ المولّد للكلمة" },
+        "story": { "type": "string", "description": "قصة ولادة الكلمة وتأثيرها الأدبي الشاعري" }
+      },
+      "required": ["id", "word", "owner", "ownerEmail", "isGift", "theme", "createdAt", "quote", "meaning", "story"]
+    }
+  },
+  "firestore": {
+    "/words/{wordId}": {
+      "schema": "WordRecord",
+      "description": "كل الكلمات العربية الفصيحة المسجلة وحجوزاتها الرمزية في المنصة"
+    }
+  }
+}

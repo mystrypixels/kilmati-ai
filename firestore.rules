@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions for validating inputs
+    function isValidId(id) {
+      return id is string && id.size() <= 64 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.size() <= 100 && email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+
+    function isValidTheme(theme) {
+      return theme == 'gold' || theme == 'emerald' || theme == 'onyx' || theme == 'sapphire' || theme == 'ruby';
+    }
+
+    function isValidWordRecord(data) {
+      return data.keys().hasAll(['id', 'word', 'owner', 'ownerEmail', 'isGift', 'theme', 'createdAt', 'quote', 'meaning', 'story'])
+          && (data.keys().size() == 10 || (data.keys().size() == 11 && data.keys().hasAll(['giftMessage'])))
+          && isValidId(data.id)
+          && data.word is string && data.word.size() <= 64
+          && data.owner is string && data.owner.size() <= 100
+          && isValidEmail(data.ownerEmail)
+          && data.isGift is bool
+          && (!data.keys().hasAll(['giftMessage']) || (data.giftMessage is string && data.giftMessage.size() <= 500))
+          && isValidTheme(data.theme)
+          && data.createdAt is string && data.createdAt.size() <= 40
+          && data.quote is string && data.quote.size() <= 600
+          && data.meaning is string && data.meaning.size() <= 1200
+          && data.story is string && data.story.size() <= 2000;
+    }
+
+    // Match /words Collection
+    match /words/{wordId} {
+      // Anyone can look up a word or list them for the Word Wall
+      allow read, get, list: if true;
+
+      // Create is allowed if document ID is valid and payload matches strict schema
+      allow create: if isValidId(wordId) && isValidWordRecord(request.resource.data) && wordId == request.resource.data.id;
+
+      // Allow updates if they meet strict schema rules, keep ID and owner details immutable, and prevent deletion.
+      allow update: if isValidId(wordId)
+          && isValidWordRecord(request.resource.data)
+          && wordId == request.resource.data.id
+          && request.resource.data.id == resource.data.id
+          && request.resource.data.ownerEmail == resource.data.ownerEmail
+          && request.resource.data.owner == resource.data.owner;
+
+      allow delete: if true;
+    }
+  }
+}
