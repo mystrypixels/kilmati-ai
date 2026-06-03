@@ -3,16 +3,16 @@ import { GoogleGenAI, Type } from "@google/genai";
 import admin from "firebase-admin";
 
 function getDB() {
-  if (!admin.apps.length) {
+  if (!admin.apps || !admin.apps.length) {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT!);
-    const firebaseConfig = JSON.parse(process.env.FIREBASE_CONFIG!);
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
-      databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`
     });
   }
   const firebaseConfig = JSON.parse(process.env.FIREBASE_CONFIG!);
-  return admin.firestore().app.firestore();
+  const db = admin.firestore();
+  db.settings({ databaseId: firebaseConfig.firestoreDatabaseId });
+  return db;
 }
 
 function stripDiacritics(text: string): string {
