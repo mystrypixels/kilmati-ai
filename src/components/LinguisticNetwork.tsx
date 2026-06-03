@@ -5,6 +5,7 @@ import {
   Compass, 
   Wand2, 
   Volume2, 
+  VolumeX,
   ShieldCheck, 
   HelpCircle, 
   Network, 
@@ -26,7 +27,8 @@ import {
   Star,
   Eye,
   CheckCircle2,
-  Bookmark
+  Bookmark,
+  LayoutGrid
 } from 'lucide-react';
 
 interface LinguisticNetworkProps {
@@ -72,6 +74,7 @@ export default function LinguisticNetwork({ words, onSelectWord }: LinguisticNet
   const [constellationTheme, setConstellationTheme] = useState<'cosmic' | 'emerald' | 'gold'>('cosmic');
   const [repulsionForce, setRepulsionForce] = useState<number>(35);
   const [isSynthesizing, setIsSynthesizing] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(false);
   
   // Share & Clipboard States
   const [isCopied, setIsCopied] = useState(false);
@@ -80,9 +83,14 @@ export default function LinguisticNetwork({ words, onSelectWord }: LinguisticNet
   const [customShareColor, setCustomShareColor] = useState<string>('#0b0821');
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
+  // View mode Toggle: 'wall' (default: simple, creative visual list of all names/words as stars) or 'simulation' (the canvas)
+  const [viewMode, setViewMode] = useState<'wall' | 'simulation'>('wall');
+
   // Internal physics models
   const nodesRef = useRef<Node[]>([]);
   const linksRef = useRef<Link[]>([]);
+  const ripplesRef = useRef<{ x: number; y: number; r: number; maxR: number; opacity: number; color: string }[]>([]);
+  const particlesRef = useRef<{ x: number; y: number; vx: number; vy: number; r: number; alpha: number; color: string }[]>([]);
   const animationFrameId = useRef<number | null>(null);
   const mouseRef = useRef<{ x: number; y: number; isDown: boolean; draggedNode: Node | null }>({
     x: 0,
@@ -90,6 +98,35 @@ export default function LinguisticNetwork({ words, onSelectWord }: LinguisticNet
     isDown: false,
     draggedNode: null
   });
+
+  const triggerNebulaPulse = () => {
+    // 1. Give all nodes a beautiful outward kinetic kick
+    nodesRef.current.forEach(node => {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 4 + Math.random() * 5;
+      node.vx = Math.cos(angle) * speed;
+      node.vy = Math.sin(angle) * speed;
+    });
+
+    // 2. Add multiple gorgeous expansion ripples spanning the center structure
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      
+      // Push 3 concentric cosmic wave ripples
+      for (let i = 0; i < 3; i++) {
+        ripplesRef.current.push({
+          x: cx + (Math.random() - 0.5) * 40,
+          y: cy + (Math.random() - 0.5) * 40,
+          r: 5,
+          maxR: 140 + (i * 45),
+          opacity: 0.85 - (i * 0.15),
+          color: i === 0 ? '#d97706' : i === 1 ? '#2563eb' : '#059669'
+        });
+      }
+    }
+  };
 
   // Get matching glow colors for themes
   const getThemeColor = (themeStr: string) => {
@@ -315,7 +352,8 @@ export default function LinguisticNetwork({ words, onSelectWord }: LinguisticNet
   };
 
   // Audio resonance cue
-  const playPerfectHarmonic = (word: WordRecord) => {
+  const playPerfectHarmonic = (word: WordRecord, forcePlay = false) => {
+    if (!soundEnabled && !forcePlay) return;
     try {
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -355,6 +393,19 @@ export default function LinguisticNetwork({ words, onSelectWord }: LinguisticNet
       osc.stop(ctx.currentTime + 1.3);
       overtone.stop(ctx.currentTime + 1.3);
 
+      // Inject physical resonance ripple centered around the selected node
+      const matchingNode = nodesRef.current.find(n => n.id === word.id);
+      if (matchingNode) {
+        ripplesRef.current.push({
+          x: matchingNode.x,
+          y: matchingNode.y,
+          r: 8,
+          maxR: 95,
+          opacity: 0.8,
+          color: getThemeColor(word.theme).main
+        });
+      }
+
       setIsSynthesizing(true);
       setTimeout(() => setIsSynthesizing(false), 800);
     } catch (e) {
@@ -393,12 +444,44 @@ export default function LinguisticNetwork({ words, onSelectWord }: LinguisticNet
       }
       ctx.fillRect(0, 0, w, h);
 
-      // Starry background noise (for a beautiful, light twinkling particles layout)
-      ctx.fillStyle = 'rgba(120, 89, 37, 0.08)';
-      for (let i = 0; i < 45; i++) {
+      // Initialize animated stardust if empty (gorgeous live stardust)
+      if (particlesRef.current.length === 0) {
+        for (let i = 0; i < 35; i++) {
+          particlesRef.current.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            vx: (Math.random() - 0.5) * 0.3,
+            vy: (Math.random() - 0.5) * 0.3,
+            r: Math.random() * 2 + 0.8,
+            alpha: Math.random() * 0.5 + 0.15,
+            color: Math.random() > 0.5 ? '#f59e0b' : '#38bdf8'
+          });
+        }
+      }
+
+      // Live Render & update background particles
+      particlesRef.current.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = w;
+        if (p.x > w) p.x = 0;
+        if (p.y < 0) p.y = h;
+        if (p.y > h) p.y = 0;
+
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha * (0.6 + Math.sin(Date.now() / 500 + p.x) * 0.4);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+      });
+
+      // Starry background noise (for secondary depth)
+      ctx.fillStyle = 'rgba(120, 89, 37, 0.05)';
+      for (let i = 0; i < 25; i++) {
         const starX = (Math.sin(i * 187.3) * 0.5 + 0.5) * w;
         const starY = (Math.cos(i * 93.4) * 0.5 + 0.5) * h;
-        const starR = (Math.sin(starX * starY) * 0.5 + 0.5) * 1.5;
+        const starR = (Math.sin(starX * starY) * 0.5 + 0.5) * 1.2;
         ctx.beginPath();
         ctx.arc(starX, starY, starR, 0, Math.PI * 2);
         ctx.fill();
@@ -478,6 +561,58 @@ export default function LinguisticNetwork({ words, onSelectWord }: LinguisticNet
         }
       }
 
+      // Draw selected node gravitational field rings / orbits
+      if (selectedNode) {
+        const pColors = getThemeColor(selectedNode.theme);
+        ctx.strokeStyle = pColors.main + '25'; // very subtle
+        ctx.lineWidth = 1.0;
+        ctx.setLineDash([3, 4]);
+        
+        ctx.beginPath();
+        ctx.arc(selectedNode.x, selectedNode.y, 45, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(selectedNode.x, selectedNode.y, 85, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.setLineDash([]); // restore solid stroke
+      }
+
+      // Tick & Draw expanding canvas resonance ripples
+      const activeRipples = ripplesRef.current;
+      for (let i = activeRipples.length - 1; i >= 0; i--) {
+        const rpl = activeRipples[i];
+        rpl.r += 1.8;
+        rpl.opacity -= 0.015;
+
+        if (rpl.opacity <= 0 || rpl.r >= rpl.maxR) {
+          activeRipples.splice(i, 1);
+          continue;
+        }
+
+        // Kinetic pushing property: the expand wave pushes nodes away briefly!
+        for (const n of nodes) {
+          const dx = n.x - rpl.x;
+          const dy = n.y - rpl.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+          
+          if (Math.abs(dist - rpl.r) < 14) {
+            const pushFactor = (1 - (rpl.r / rpl.maxR)) * rpl.opacity * 0.4;
+            n.vx += (dx / dist) * pushFactor;
+            n.vy += (dy / dist) * pushFactor;
+          }
+        }
+
+        ctx.strokeStyle = rpl.color;
+        ctx.globalAlpha = rpl.opacity;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(rpl.x, rpl.y, rpl.r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1.0; // reset
+      }
+
       // Draw Node points + beautiful Arabic scripture labels
       for (const n of nodes) {
         const isSelected = selectedNode?.id === n.id;
@@ -550,7 +685,7 @@ export default function LinguisticNetwork({ words, onSelectWord }: LinguisticNet
       const parent = containerRef.current;
       if (canvas && parent) {
         canvas.width = parent.clientWidth;
-        canvas.height = 360;
+        canvas.height = 210;
       }
     };
 
@@ -1234,95 +1369,370 @@ export default function LinguisticNetwork({ words, onSelectWord }: LinguisticNet
         {/* Left Area: Core Canvas & Filters block */}
         <div className="lg:col-span-8 flex flex-col space-y-3">
           
-          <div className="bg-white rounded-2xl p-3 border border-neutral-200 flex flex-wrap gap-4 items-center justify-between text-xs my-0.5 shadow-xs">
+          <div className="bg-white rounded-2xl p-3 border border-neutral-200 flex flex-wrap gap-3 items-center justify-between text-xs my-0.5 shadow-xs">
             
-            <div className="flex items-center gap-4 flex-wrap">
-              {/* Force connection modes */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] text-neutral-500 font-bold">قرابة الربط:</span>
-                <select
-                  value={linkMode}
-                  onChange={(e) => setLinkMode(e.target.value as any)}
-                  className="bg-neutral-50 border border-neutral-300 text-neutral-800 rounded px-2 py-1 text-[10.5px] font-bold outline-none cursor-pointer focus:border-amber-500/40"
-                >
-                  <option value="theme">ترابط المشاعر (Same Theme)</option>
-                  <option value="letters">ترابط الحروف (Shared letters)</option>
-                  <option value="none">عزلة تامة (Isolated points)</option>
-                </select>
-              </div>
-
-              {/* Theme color scheme of space */}
-              <div className="flex items-center gap-1">
-                <span className="text-[10px] text-neutral-500">فضاء المعرض:</span>
-                <div className="flex gap-1">
-                  {(['cosmic', 'emerald', 'gold'] as const).map((thm) => (
-                    <button
-                      key={thm}
-                      onClick={() => setConstellationTheme(thm)}
-                      className={`text-[9.5px] px-2 py-1 rounded transition border capitalize ${
-                        constellationTheme === thm 
-                          ? 'bg-amber-100 text-amber-900 border-amber-300' 
-                          : 'bg-neutral-50 border-neutral-200 text-neutral-600'
-                      }`}
-                    >
-                      {thm === 'cosmic' ? '🌌 كوني' : thm === 'emerald' ? '🌲 زمردي' : '✨ ذهبي'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Gravity space factor */}
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-neutral-500">قوة التنافر:</span>
-                <input
-                  type="range"
-                  min="5"
-                  max="90"
-                  value={repulsionForce}
-                  onChange={(e) => setRepulsionForce(parseInt(e.target.value))}
-                  className="w-18 accent-amber-600 h-1 bg-neutral-200 rounded cursor-pointer"
-                />
-              </div>
+            {/* View Mode Toggle Controls */}
+            <div className="flex bg-neutral-100 p-1 rounded-xl border border-neutral-200/60" id="cosmic-wall-toggle-root">
+              <button
+                type="button"
+                onClick={() => setViewMode('wall')}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all duration-300 cursor-pointer ${
+                  viewMode === 'wall'
+                    ? 'bg-white text-amber-955 border border-neutral-250 shadow-xs font-bold scale-[1.01]'
+                    : 'text-neutral-500 hover:text-neutral-850'
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5 text-amber-700" />
+                <span>حائط السديم والملكيات ✨</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('simulation')}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all duration-300 cursor-pointer ${
+                  viewMode === 'simulation'
+                    ? 'bg-white text-indigo-950 border border-neutral-250 shadow-xs font-bold scale-[1.01]'
+                    : 'text-neutral-500 hover:text-neutral-850'
+                }`}
+              >
+                <Network className="w-3.5 h-3.5 text-indigo-700 font-bold" />
+                <span>الخريطة الفيزيائية 🌌</span>
+              </button>
             </div>
 
+            {/* Simulated Space controls - only visible if in simulation mode */}
+            {viewMode === 'simulation' && (
+              <div className="flex items-center gap-3.5 flex-wrap border-r border-neutral-200 pr-3 mr-1">
+                {/* Force connection modes */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-neutral-500 font-bold">قرابة الربط:</span>
+                  <select
+                    value={linkMode}
+                    onChange={(e) => setLinkMode(e.target.value as any)}
+                    className="bg-neutral-50 border border-neutral-300 text-neutral-800 rounded px-2 py-1 text-[10.5px] font-bold outline-none cursor-pointer focus:border-amber-500/40"
+                  >
+                    <option value="theme">ترابط المشاعر</option>
+                    <option value="letters">ترابط الحروف</option>
+                    <option value="none">عزلة تامة</option>
+                  </select>
+                </div>
+
+                {/* Theme color scheme of space */}
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] text-neutral-550">الفضاء:</span>
+                  <div className="flex gap-0.5">
+                    {(['cosmic', 'emerald', 'gold'] as const).map((thm) => (
+                      <button
+                        key={thm}
+                        type="button"
+                        onClick={() => setConstellationTheme(thm)}
+                        className={`text-[9.5px] px-2 py-0.5 rounded transition border capitalize cursor-pointer ${
+                          constellationTheme === thm 
+                            ? 'bg-amber-100 text-amber-900 border-amber-300' 
+                            : 'bg-neutral-50 border-neutral-200 text-neutral-600'
+                        }`}
+                      >
+                        {thm === 'cosmic' ? 'كوني' : thm === 'emerald' ? 'زمردي' : 'ذهبي'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Gravity space factor */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-neutral-550 font-bold">التنافر:</span>
+                  <input
+                    type="range"
+                    min="5"
+                    max="90"
+                    value={repulsionForce}
+                    onChange={(e) => setRepulsionForce(parseInt(e.target.value))}
+                    className="w-14 accent-amber-600 h-1 bg-neutral-200 rounded cursor-pointer"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Interactive Audio Toggle Controls */}
+            <button
+              type="button"
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all duration-300 cursor-pointer border ${
+                soundEnabled
+                  ? 'bg-amber-50 border-amber-300 text-amber-900 shadow-xs'
+                  : 'bg-neutral-50/80 border-neutral-250 text-neutral-500 hover:text-neutral-700'
+              }`}
+              title={soundEnabled ? 'إيقاف تشغيل نغمات الكلمات' : 'تفعيل نغمات الكلمات التفاعلية عند النقر'}
+            >
+              {soundEnabled ? (
+                <>
+                  <Volume2 className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                  <span className="text-[10px]">نغمات تفاعلية 🔊</span>
+                </>
+              ) : (
+                <>
+                  <VolumeX className="w-3.5 h-3.5 text-neutral-400" />
+                  <span className="text-[10px]">النغمات معطلة 🔇</span>
+                </>
+              )}
+            </button>
+
             {/* Quick Filter Search Input */}
-            <div className="relative w-full sm:w-auto">
-              <Search className="absolute right-2.5 top-2 w-3.5 h-3.5 text-neutral-400" />
+            <div className="relative w-full sm:w-auto flex-1 sm:flex-initial">
+              <Search className="absolute right-2.5 top-2.5 w-3.5 h-3.5 text-neutral-400" />
               <input
                 type="text"
-                placeholder="ابحث عن كلمة في الأطلس الحالي..."
+                placeholder="ابحث عن كلمة في الأطلس..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-neutral-50 border border-neutral-300 focus:border-amber-500/50 rounded-lg pr-7 pl-2.5 py-1 text-[11px] text-neutral-800 outline-none w-full sm:w-44 text-right placeholder-neutral-400"
+                className="bg-neutral-50 border border-neutral-300 focus:border-amber-500/50 rounded-lg pr-7 pl-2.5 py-1.5 text-[11px] text-neutral-800 outline-none w-full sm:w-40 text-right placeholder-neutral-450 font-sans"
               />
             </div>
 
           </div>
 
-          {/* Interactive Core Canvas Container */}
-          <div 
-            ref={containerRef} 
-            className="w-full bg-[#faf9f6] border border-neutral-200 rounded-2xl relative overflow-hidden cursor-grab min-h-[360px]"
-          >
-            <canvas
-              ref={canvasRef}
-              onMouseDown={handleCanvasMouseDown}
-              onMouseMove={handleCanvasMouseMove}
-              onMouseUp={handleCanvasMouseUp}
-              onMouseLeave={handleCanvasMouseUp}
-              className="block w-full h-full"
-            />
+          {/* Interactive Core Core View Container */}
+          {viewMode === 'simulation' ? (
+            <div 
+              ref={containerRef} 
+              className="w-full bg-[#faf9f6]/95 border border-neutral-200 rounded-2xl relative overflow-hidden cursor-grab min-h-[295px] shadow-sm transition-all duration-300"
+            >
+              <canvas
+                ref={canvasRef}
+                onMouseDown={handleCanvasMouseDown}
+                onMouseMove={handleCanvasMouseMove}
+                onMouseUp={handleCanvasMouseUp}
+                onMouseLeave={handleCanvasMouseUp}
+                className="block w-full h-full"
+              />
 
-            {/* Micro instructional hints */}
-            <div className="absolute bottom-2.5 right-3 px-2.5 py-1 bg-white/90 rounded-lg text-[9px] text-neutral-600 pointer-events-none select-none border border-neutral-200 font-sans relative-z-20 shadow-xs">
-              🖱️ اسحب النجم طويلاً لتغيير مداره • انقر مزدوجاً لسماع السيمياء الصوتية
-            </div>
+              {/* Premium Cosmic Pulse interactive property trigger */}
+              <button
+                type="button"
+                onClick={triggerNebulaPulse}
+                className="absolute top-2.5 right-3 px-3 py-1 bg-amber-700 text-amber-50 hover:bg-amber-600 rounded-lg text-[10px] select-none border border-amber-600/30 font-sans flex items-center gap-1 shadow-xs z-25 active:scale-95 transition cursor-pointer font-black"
+                title="إطلاق نبض سديمي كوني يرسل موجات جاذبية تدفع النجوم في الفضاء"
+              >
+                <Sparkles className="w-3 h-3 text-amber-200 animate-spin" style={{ animationDuration: '5s' }} />
+                <span>إطلاق نبض سديمي كوني 💥</span>
+              </button>
 
-            <div className="absolute top-2.5 left-3 px-2.5 py-1 bg-white/90 rounded-md text-[9px] text-neutral-600 pointer-events-none select-none border border-neutral-200 font-sans flex items-center gap-1.5 shadow-xs">
-              <span className="inline-block w-1.5 h-1.5 bg-amber-550 rounded-full animate-ping" />
-              <span>{filteredWordsDataset.length} نقاط ترتبط بالفلتر المحدّد</span>
+              {/* Micro instructional hints */}
+              <div className="absolute bottom-2.5 right-3 px-2.5 py-1 bg-white/95 rounded-lg text-[10px] text-neutral-700 pointer-events-none select-none border border-neutral-200 font-sans z-20 shadow-xs">
+                🖱️ اسحب النجم طويلاً لتغيير مداره • انقر على أي نجم لسماع الرنين الكوني الميثاقي
+              </div>
+
+              <div className="absolute top-2.5 left-3 px-2.5 py-1 bg-white/95 rounded-md text-[10px] text-neutral-700 pointer-events-none select-none border border-neutral-200 font-sans flex items-center gap-1.5 shadow-xs z-25">
+                <span className="inline-block w-1.5 h-1.5 bg-amber-600 rounded-full animate-ping" />
+                <span>{filteredWordsDataset.length} نقاط ترتبط بالفلتر المحدّد</span>
+              </div>
             </div>
-          </div>
+          ) : (
+            /* Exciting and Simplified Astral Wall showing all Words & Owners in a Creative Different layout */
+            <div 
+              className="w-full border border-neutral-800 rounded-3xl p-4 sm:p-5 relative overflow-hidden min-h-[295px] flex flex-col justify-between transition-all duration-300 shadow-xl"
+              style={{
+                background: constellationTheme === 'emerald' 
+                  ? 'linear-gradient(to bottom, #02120b, #000704)' 
+                  : constellationTheme === 'gold' 
+                  ? 'linear-gradient(to bottom, #181102, #0b0700)' 
+                  : 'linear-gradient(to bottom, #090815, #020108)'
+              }}
+            >
+              {/* Starry Night Sky Background overlay inside the Wall */}
+              <div className="absolute inset-0 opacity-[0.2] pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-transparent to-transparent z-0" />
+              
+              {/* Twinkling particle stars overlay */}
+              <div className="absolute inset-0 pointer-events-none z-0">
+                {[...Array(25)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute bg-white rounded-full animate-pulse"
+                    style={{
+                      width: `${Math.random() * 2 + 1}px`,
+                      height: `${Math.random() * 2 + 1}px`,
+                      top: `${Math.random() * 100}%`,
+                      left: `${Math.random() * 100}%`,
+                      animationDuration: `${Math.random() * 2.5 + 1.5}s`,
+                      animationDelay: `${Math.random() * 2}s`
+                    }}
+                  />
+                ))}
+              </div>
+
+              <div className="relative z-10 w-full flex flex-col justify-between h-full">
+                
+                {/* Header for Wall inside containment */}
+                <div className="flex items-center justify-between border-b border-white/5 pb-2.5 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: '6s' }} />
+                    <span className="text-[10px] sm:text-xs font-black text-amber-300 tracking-wider font-sans">سديم حائط الكلمات والملكيات الوجودية الفاخرة</span>
+                  </div>
+                  <span className="text-[9px] sm:text-[10px] text-neutral-450 bg-white/5 px-2 py-0.5 rounded-full border border-white/10 font-mono">
+                    {filteredWordsDataset.length} ممتلكات وجدانية
+                  </span>
+                </div>
+
+                {filteredWordsDataset.length === 0 ? (
+                  <div className="py-24 text-center space-y-2">
+                    <HelpCircle className="w-8 h-8 text-neutral-600 mx-auto animate-pulse" />
+                    <p className="text-xs text-neutral-450">لم نعثر على كلمات تناسب البحث أو الفلتر المحدّد.</p>
+                  </div>
+                ) : (
+                  /* Beautifully adaptive and responsive self-shrinking grid */
+                  (() => {
+                    const totalCount = filteredWordsDataset.length;
+                    
+                    // Dynamic values that continuously shrink as the list grows!
+                    let gridClass = "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5";
+                    let cardClass = "p-3.5 min-h-[95px] rounded-2xl";
+                    let wordClass = "text-lg sm:text-xl";
+                    let isCompact = false;
+                    let isUltraCompact = false;
+
+                    if (totalCount >= 28) {
+                      // Ultra compact: only tiny beautiful pill-like stars with the word!
+                      gridClass = "grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-2 pb-1";
+                      cardClass = "p-2 min-h-[50px] rounded-xl items-center justify-center text-center";
+                      wordClass = "text-xs sm:text-sm";
+                      isUltraCompact = true;
+                      isCompact = true;
+                    } else if (totalCount >= 13) {
+                      // Compact layout
+                      gridClass = "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5";
+                      cardClass = "p-2 sm:p-2.5 min-h-[72px] rounded-xl";
+                      wordClass = "text-sm sm:text-base";
+                      isCompact = true;
+                    }
+
+                    return (
+                      <div className={`grid ${gridClass} max-h-[200px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent`} id="wall-dynamic-cosmic-grid">
+                        {filteredWordsDataset.map((item) => {
+                          const isSelected = selectedNode?.id === item.id;
+                          const config = getThemeColor(item.theme);
+                          
+                          // Accent style configurations
+                          const accents: Record<string, { bg: string, border: string, text: string, star: string, shadow: string }> = {
+                            gold: { 
+                              bg: "hover:bg-amber-500/10", 
+                              border: isSelected ? "border-amber-400 ring-2 ring-amber-400/20" : "border-amber-500/20 hover:border-amber-400/60",
+                              text: "text-amber-300", 
+                              star: "text-amber-400 fill-amber-500/20",
+                              shadow: "shadow-amber-500/5",
+                            },
+                            emerald: { 
+                              bg: "hover:bg-emerald-500/10", 
+                              border: isSelected ? "border-emerald-400 ring-2 ring-emerald-400/20" : "border-emerald-500/20 hover:border-emerald-400/60",
+                              text: "text-emerald-300", 
+                              star: "text-emerald-400 fill-emerald-500/20",
+                              shadow: "shadow-emerald-500/5",
+                            },
+                            ruby: { 
+                              bg: "hover:bg-rose-500/10", 
+                              border: isSelected ? "border-rose-400 ring-2 ring-rose-400/20" : "border-rose-500/20 hover:border-rose-400/60",
+                              text: "text-rose-300", 
+                              star: "text-rose-400 fill-rose-500/20",
+                              shadow: "shadow-rose-500/5",
+                            },
+                            sapphire: { 
+                              bg: "hover:bg-blue-500/10", 
+                              border: isSelected ? "border-blue-400 ring-2 ring-blue-400/20" : "border-blue-500/20 hover:border-blue-400/60",
+                              text: "text-blue-300", 
+                              star: "text-blue-400 fill-blue-500/20",
+                              shadow: "shadow-blue-500/5",
+                            },
+                            onyx: { 
+                              bg: "hover:bg-stone-500/10", 
+                              border: isSelected ? "border-stone-400 ring-2 ring-stone-400/20" : "border-stone-550/20 hover:border-stone-400/60",
+                              text: "text-[#dcd6cd]", 
+                              star: "text-stone-300 fill-stone-500/20",
+                              shadow: "shadow-stone-500/5",
+                            },
+                          };
+                          
+                          const style = accents[item.theme] || accents.gold;
+
+                          return (
+                            <div
+                              key={item.id}
+                              onClick={() => {
+                                // Find corresponding physics node to update shared highlight states smoothly
+                                const correspondingNode = nodesRef.current.find(n => n.id === item.id);
+                                if (correspondingNode) {
+                                  setSelectedNode(correspondingNode);
+                                }
+                                playPerfectHarmonic(item);
+                              }}
+                              className={`group relative transition-all duration-300 transform hover:scale-103 cursor-pointer text-right flex flex-col justify-between select-none ${
+                                isSelected 
+                                  ? 'bg-white/10 backdrop-blur-md' 
+                                  : `bg-white/[0.03] backdrop-blur-xs hover:bg-white/[0.08]`
+                              } ${cardClass} ${style.border} ${style.shadow}`}
+                              id={`astro-star-node-${item.id}`}
+                            >
+                              {/* Pulsing micro atmospheric glow under selected cells */}
+                              {isSelected && (
+                                <div 
+                                  className="absolute inset-0 opacity-[0.14] blur-xl rounded-2xl pointer-events-none -z-10 transition-all duration-300"
+                                  style={{
+                                    background: `radial-gradient(circle, ${config.main} 10%, transparent 80%)`
+                                  }}
+                                />
+                              )}
+
+                              {/* Top-row: star badge status (hidden if ultra-compact) */}
+                              {!isUltraCompact && (
+                                <div className="flex items-center justify-between text-right w-full mb-0.5">
+                                  <span className="text-[8.5px] font-black text-neutral-400 opacity-60 group-hover:opacity-100 transition truncate max-w-[80px]">
+                                    صنف {item.theme.toUpperCase()}
+                                  </span>
+                                  <Star className={`w-3 h-3 ${style.star} shrink-0 ${isSelected ? 'animate-spin' : 'animate-pulse'}`} style={{ animationDuration: isSelected ? '4s' : '3s' }} />
+                                </div>
+                              )}
+
+                              {/* Calligraphy word itself */}
+                              <div className="text-right w-full">
+                                <span className={`block font-bold font-serif-arabic ${style.text} leading-tight drop-shadow-sm ${wordClass}`}>
+                                  {item.word}
+                                </span>
+                              </div>
+
+                              {/* Owner Signature bottom row (completely hidden if compact or ultra-compact) */}
+                              {!isCompact && (
+                                <div className="pt-1.5 border-t border-white/[0.04] flex items-center justify-between text-[10px] text-neutral-450 font-sans">
+                                  <div className="flex items-center gap-1 truncate max-w-[130px]" title={item.owner}>
+                                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                                    <span className="truncate group-hover:text-stone-200 transition">
+                                      الحائز: {item.owner}
+                                    </span>
+                                  </div>
+                                  
+                                  {item.isGift && (
+                                    <span className="text-[8px] bg-rose-500/10 border border-rose-500/20 text-rose-300 px-1 py-0.2 rounded font-bold shrink-0">
+                                      🎁 إهداء
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()
+                )}
+
+              </div>
+
+              {/* Bottom instructional micro-indicators */}
+              <div className="relative z-10 select-none pointer-events-none mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between text-[9px] text-neutral-450 font-sans">
+                <span className="flex items-center gap-1">
+                  <span className="inline-block w-1.5 h-1.5 bg-yellow-400 rounded-full animate-ping" />
+                  <span>انقر على أي نجمة لسماع سيمياء الرنين وتنزيل الوثيقة</span>
+                </span>
+                <span>✦ ديوان كلمتي الميثاقي</span>
+              </div>
+            </div>
+          )}
 
         </div>
 
@@ -1342,7 +1752,7 @@ export default function LinguisticNetwork({ words, onSelectWord }: LinguisticNet
                   
                   <button
                     type="button"
-                    onClick={() => playPerfectHarmonic(selectedNode.record)}
+                    onClick={() => playPerfectHarmonic(selectedNode.record, true)}
                     className="text-[10.5px] font-bold text-amber-900 hover:text-amber-950 transition flex items-center gap-1 px-2.5 py-1 bg-amber-50 rounded-lg border border-amber-200 active:scale-95 shadow-xs"
                     disabled={isSynthesizing}
                   >

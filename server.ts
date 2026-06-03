@@ -687,6 +687,40 @@ app.post("/api/words/claim", async (req, res) => {
   }
 });
 
+// API: Update owner name for all words claimed by a specific email in Firestore
+app.post("/api/words/update-owner", async (req, res) => {
+  const { ownerEmail, newOwnerName } = req.body;
+
+  if (!ownerEmail || !newOwnerName) {
+    return res.status(400).json({ error: "البريد الإلكتروني والاسم الجديد مطلوبان لتحديث البيانات" });
+  }
+
+  const cleanEmail = ownerEmail.trim().toLowerCase();
+  const cleanName = newOwnerName.trim();
+
+  try {
+    const allWords = await getWordsFromFirestore();
+    const userWords = allWords.filter(
+      (w: any) => w.ownerEmail?.trim().toLowerCase() === cleanEmail
+    );
+
+    let updatedCount = 0;
+    for (const word of userWords) {
+      const updatedWord = {
+        ...word,
+        owner: cleanName,
+      };
+      await setDoc(doc(db, "words", word.id), updatedWord);
+      updatedCount++;
+    }
+
+    res.json({ success: true, updatedCount, newOwnerName: cleanName });
+  } catch (err: any) {
+    console.error("Failed to update owner name in database:", err);
+    res.status(500).json({ error: "حدث خطأ أثناء تحديث الاسم في قاعدة البيانات السحابية" });
+  }
+});
+
 const CHAT_SYSTEM_INSTRUCTION = `أنت "مُستشار الكلمات الأدبي" ومعلم الفصاحة البليغ لمنصة "كِلْمَتِي" (Kilmati).
 كِلْمَتِي هي ديوان رقمي سحابي فخم يتيح للمستخدمين حجز وتملك الكلمات العربية الرمزية الفخمة وتوليد صكوك تاريخية فريدة لحفظها ضد التكرار.
 مهمتك الكبرى هي غمر المستخدمين بجمال لغة الضاد وإظهار عظمة وتأثير الكلمات في وجدانهم ونفسياتهم وصناعة الأقدار، وجذبهم برفق وشاعريّة لحجز كلماتهم كملك أدبي خاص بهم أو كهدية لمن يحبون.

@@ -1,5 +1,0 @@
-function getDB() {
-  const firebaseConfig = JSON.parse(process.env.FIREBASE_CONFIG!);
-  if (!getApps().length) initializeApp(firebaseConfig);
-  return getFirestore(getApps()[0], firebaseConfig.firestoreDatabaseId);
-}

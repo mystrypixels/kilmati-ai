@@ -5,7 +5,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { WordRecord } from './types';
-import WordWall from './components/WordWall';
 import BookingForm from './components/BookingForm';
 import Certificate from './components/Certificate';
 import HowItWorks from './components/HowItWorks';
@@ -15,6 +14,7 @@ import OurStory from './components/OurStory';
 import CollapsibleFAQ from './components/CollapsibleFAQ';
 import AIChatCompanion from './components/AIChatCompanion';
 import LinguisticNetwork from './components/LinguisticNetwork';
+import AuthProfile from './components/AuthProfile';
 import { classifyArabicWord } from './utils';
 import { Sparkles, MessageCircle, Info, Award, Compass, Search, Gift, ShieldAlert, History, HelpCircle, Flame, DollarSign, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -206,38 +206,47 @@ export default function App() {
       <div className="h-2 bg-gradient-to-r from-neutral-800 via-amber-500 to-neutral-900 w-full animate-pulse"></div>
 
       {/* Premium Top Navigation Bar with Logo */}
-      <nav id="kilemati-top-nav" className="bg-white/75 backdrop-blur-md border-b border-neutral-200/50 sticky top-0 z-50 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      <nav id="kilemati-top-nav" className="bg-white/75 backdrop-blur-md border-b border-neutral-200/50 sticky top-0 z-50 transition-all duration-300 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[4.5rem] py-3 sm:py-0 flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Logo Emblem */}
-            <div className="w-11 h-11 rounded-2xl bg-stone-100 flex items-center justify-center shadow-md border border-neutral-200/50 relative overflow-hidden group shrink-0">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-stone-100 flex items-center justify-center shadow-md border border-neutral-200/50 relative overflow-hidden group shrink-0">
               <img src={logoImg} alt="شعار منصة كلمتي" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" referrerPolicy="no-referrer" />
             </div>
             
             {/* Logo Wordmark "كلمتي" (Kilmati) */}
             <div className="flex flex-col text-right">
-              <span className="font-serif-arabic text-xl md:text-2xl font-black text-neutral-800 tracking-tight flex items-center gap-2">
-                كِلْمَتِي <span className="text-amber-600 text-[10px] font-sans px-1.5 py-0.5 bg-amber-50 rounded border border-amber-200/50 uppercase font-black tracking-widest leading-none">Kilmati</span>
+              <span className="font-serif-arabic text-lg sm:text-xl md:text-2xl font-black text-neutral-800 tracking-tight flex items-center gap-1.5 sm:gap-2">
+                كِلْمَتِي <span className="text-amber-600 text-[9px] sm:text-[10px] font-sans px-1.5 py-0.5 bg-amber-50 rounded border border-amber-200/50 uppercase font-black tracking-widest leading-none">Kilmati</span>
               </span>
-              <span className="text-[10px] text-neutral-500 font-medium">المنصة الملكية لتوثيق الكلمات والمشاعر العربية الفصيحة</span>
+              <span className="text-[10px] text-neutral-500 font-medium hidden sm:block">المنصة الملكية لتوثيق الكلمات والمشاعر العربية الفصيحة</span>
             </div>
           </div>
           
           {/* Quick links & active indicator */}
-          <div className="hidden sm:flex items-center gap-4">
-            <span className="text-xs text-neutral-400 font-medium flex items-center gap-1.5">
-              <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-              السجلات السحابية نشطة
-            </span>
-            <button
-              onClick={() => {
-                const el = document.getElementById("words-wall");
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="text-xs text-amber-800 bg-amber-50 hover:bg-amber-100/80 font-bold px-3.5 py-2 rounded-xl border border-amber-200 transition-all duration-300"
-            >
-              طالع ديوان الكلمات
-            </button>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="hidden md:flex items-center gap-4">
+              <span className="text-xs text-neutral-400 font-medium flex items-center gap-1.5 font-sans">
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                السجلات السحابية نشطة
+              </span>
+              <button
+                onClick={() => {
+                  const el = document.getElementById("words-wall");
+                  el?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="text-xs text-amber-800 bg-amber-50 hover:bg-amber-100/80 font-bold px-3.5 py-2 rounded-xl border border-amber-200 transition-all duration-300 font-sans"
+              >
+                طالع ديوان الكلمات
+              </button>
+            </div>
+
+            {/* User Literary Membership Accounts */}
+            <AuthProfile 
+              words={words} 
+              onSelectWord={(word) => setSelectedWord(word)} 
+              onProfileUpdated={fetchWords}
+            />
           </div>
         </div>
       </nav>
@@ -468,10 +477,6 @@ export default function App() {
           ) : (
             <div className="space-y-8">
               <LinguisticNetwork
-                words={words}
-                onSelectWord={(wordRecord) => setSelectedWord(wordRecord)}
-              />
-              <WordWall
                 words={words}
                 onSelectWord={(wordRecord) => setSelectedWord(wordRecord)}
               />

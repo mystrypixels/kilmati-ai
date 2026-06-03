@@ -3,6 +3,7 @@ import { SearchResult, WordRecord, CertificateTheme } from '../types';
 import { Sparkles, Gift, Check, ArrowRight, User, Mail, Award, AlertCircle, Loader2, CreditCard, ChevronRight, Globe, ShieldCheck, MapPin, Navigation } from 'lucide-react';
 import { motion } from 'motion/react';
 import { classifyArabicWord, WordClassification } from '../utils';
+import { auth } from '../firebase';
 
 interface BookingFormProps {
   onSuccess: (newRecord: WordRecord) => void;
@@ -136,6 +137,19 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
       setLocationName(country);
     }
   }, [country]);
+
+  // Set owner details from current user if logged in
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      if (user.displayName) {
+        setOwner(user.displayName);
+      }
+      if (user.email) {
+        setOwnerEmail(user.email);
+      }
+    }
+  }, []);
 
   const isExcludedCoordinates = (latitude: number, longitude: number) => {
     // Palestine/Israel area bounding box
@@ -530,6 +544,21 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
                 <span className="text-xl font-extrabold text-amber-600 font-mono">${activeTierDetails.price}</span>
               </div>
             </div>
+
+            {auth.currentUser ? (
+              <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-2xl p-3.5 text-right flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-850 text-xs shrink-0 font-black">✓</span>
+                <p className="text-[10.5px] text-emerald-900 font-semibold leading-normal">
+                  مرحباً يا <strong className="font-extrabold">{auth.currentUser.displayName || "أديب الديوان"}</strong>! تم تعبئة البيانات تلقائياً، وسيتم ربط حجز الكلمة بحساب عضويتك لتجدها في ملفك الشخصي لاحقاً.
+                </p>
+              </div>
+            ) : (
+              <div className="bg-amber-500/5 border border-amber-500/15 rounded-2xl p-3.5 text-right flex items-center gap-2 font-sans">
+                <p className="text-[10px] text-amber-900 font-medium leading-relaxed">
+                  💡 <strong>ملاحظة هامة:</strong> ننصح بـ <strong className="text-amber-950 underline font-black">تسجيل العضوية أو تسجيل الدخول</strong> من أعلى الصفحة أولاً؛ ليتسنى لك حفظ الصك وإيجاد كلماتك في ملفك الشخصي لاحقاً في أي وقت.
+                </p>
+              </div>
+            )}
 
              {/* Owner Credentials & Countries selection */}
              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 font-sans">
