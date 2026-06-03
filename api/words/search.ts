@@ -1,18 +1,17 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenAI, Type } from "@google/genai";
-import admin from "firebase-admin";
+import { initializeApp, getApps, cert } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
 
 function getDB() {
-  if (!admin.apps || !admin.apps.length) {
+  if (!getApps().length) {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT!);
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
+    initializeApp({
+      credential: cert(serviceAccount),
     });
   }
   const firebaseConfig = JSON.parse(process.env.FIREBASE_CONFIG!);
-  const db = admin.firestore();
-  db.settings({ databaseId: firebaseConfig.firestoreDatabaseId });
-  return db;
+  return getFirestore(getApps()[0], firebaseConfig.firestoreDatabaseId);
 }
 
 function stripDiacritics(text: string): string {
@@ -60,35 +59,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
-      contents: `أنت خبير لغوي عربي بليغ. قدم تحليلاً أدبياً للكلمة: "${normalizedWord}". أرجع JSON فقط بالحقول: word, meaning, quote, story, suggestedPoets (مصفوفة 3 أسماء).`,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            word: { type: Type.STRING },
-            meaning: { type: Type.STRING },
-            quote: { type: Type.STRING },
-            story: { type: Type.STRING },
-            suggestedPoets: { type: Type.ARRAY, items: { type: Type.STRING } }
-          },
-          required: ["word", "meaning", "quote", "story", "suggestedPoets"],
-        }
-      }
-    });
-    const aiData = JSON.parse(response.text || "{}");
-    res.json({ available: true, word: normalizedWord, aiFeedback: aiData });
-  } catch (e) {
-    res.json({
-      available: true,
-      word: normalizedWord,
-      aiFeedback: {
-        word: normalizedWord,
-        meaning: `كلمة "${normalizedWord}" تحمل معاني عميقة في اللغة العربية.`,
-        quote: `يا لجمال كلمة "${normalizedWord}" في لغة الضاد.`,
-        story: `لكل كلمة حكاية، و"${normalizedWord}" من أجملها.`,
-        suggestedPoets: ["المتنبي", "محمود درويش", "نزار قباني"]
-      }
-    });
-  }
-}
+      contents: `أنت خبير لغوي عربي بليغ. قدم
