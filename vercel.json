@@ -2,18 +2,26 @@
   "version": 2,
   "builds": [
     {
+      "src": "server.ts",
+      "use": "@vercel/node"
+    },
+    {
       "src": "package.json",
-      "use": "@vercel/node",
+      "use": "@vercel/static-build",
       "config": {
-        "buildCommand": "npm run build",
+        "buildCommand": "vite build",
         "outputDirectory": "dist"
       }
     }
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "server.ts"
+    },
+    {
       "src": "/(.*)",
-      "dest": "dist/server.cjs"
+      "dest": "/dist/$1"
     }
   ]
 }
