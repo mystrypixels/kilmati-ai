@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenAI, Type } from "@google/genai";
-import * as admin from "firebase-admin";
+import admin from "firebase-admin";
 
 function getDB() {
   if (!admin.apps.length) {
