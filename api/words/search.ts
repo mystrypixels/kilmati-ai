@@ -1,12 +1,18 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenAI, Type } from "@google/genai";
-import { initializeApp, getApps } from "firebase/app";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import * as admin from "firebase-admin";
 
 function getDB() {
+  if (!admin.apps.length) {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT!);
+    const firebaseConfig = JSON.parse(process.env.FIREBASE_CONFIG!);
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`
+    });
+  }
   const firebaseConfig = JSON.parse(process.env.FIREBASE_CONFIG!);
-  if (!getApps().length) initializeApp(firebaseConfig);
-  return getFirestore(getApps()[0], firebaseConfig.firestoreDatabaseId);
+  return admin.firestore().app.firestore();
 }
 
 function stripDiacritics(text: string): string {
@@ -24,7 +30,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   let normalizedWord = queryWord.trim();
-  const db = getDB();
 
   if (!hasDiacritics(normalizedWord)) {
     try {
@@ -41,9 +46,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const stripped = stripDiacritics(normalizedWord);
-  const snapshot = await getDocs(collection(db, "words"));
+  const db = getDB();
+  const snapshot = await db.collection("words").get();
   const words: any[] = [];
-  snapshot.forEach(d => words.push(d.data()));
+  snapshot.forEach((d: any) => words.push(d.data()));
 
   const taken = words.find((w: any) => stripDiacritics(w.word) === stripped);
   if (taken) {
