@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { WordRecord } from '../types';
-import { Sparkles, Search, Plus, Award, ShieldCheck, Heart, User, Share2 } from 'lucide-react';
+import { Sparkles, Search, Plus, Award, ShieldCheck, Heart, User, Share2, X } from 'lucide-react';
 import { classifyArabicWord } from '../utils';
 
 interface LinguisticNetworkProps {
@@ -102,15 +102,26 @@ export default function LinguisticNetwork({ words, onSelectWord, onAddWord }: Li
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white/70 p-4 border border-stone-200/60 rounded-2xl shadow-3xs">
         
         {/* Search input */}
-        <div className="relative w-full md:w-72">
+        <div className="relative w-full md:w-72 flex items-center">
           <Search className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-stone-400" />
           <input
             type="text"
             placeholder="ابحث عن كلمة، أو مالك..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-3 pr-10 py-2 bg-stone-50 border border-stone-200/80 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/10 focus:border-amber-500/70 duration-200 font-heading-arabic"
+            className="w-full pl-8 pr-10 py-2 bg-stone-50 border border-stone-200/80 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/10 focus:border-amber-500/70 duration-200 font-heading-arabic"
           />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => setSearchTerm('')}
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors p-1 rounded-full hover:bg-stone-200/55 cursor-pointer flex items-center justify-center"
+              aria-label="مسح البحث"
+              id="clear-wall-search-btn"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
         {/* Style/Theme categories quick filters */}

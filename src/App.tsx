@@ -17,7 +17,7 @@ import AuthProfile from './components/AuthProfile';
 import TrustSection from './components/TrustSection';
 import MysticOracle from './components/MysticOracle';
 import { classifyArabicWord } from './utils';
-import { Sparkles, MessageCircle, Info, Award, Compass, Search, Gift, ShieldAlert, History, HelpCircle, Flame, DollarSign, CheckCircle, FileText, Mail, ShoppingBag } from 'lucide-react';
+import { Sparkles, MessageCircle, Info, Award, Compass, Search, Gift, ShieldAlert, History, HelpCircle, Flame, DollarSign, CheckCircle, FileText, Mail, ShoppingBag, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 const POPULAR_WORDS_LIST = [
@@ -349,16 +349,27 @@ export default function App() {
         <div className="max-w-xl mx-auto pt-4">
           <form onSubmit={handleHeroSearchSubmit} className="relative group/search bg-white p-1.5 rounded-[24px] border border-neutral-200/80 shadow-[0_10px_30px_rgba(0,0,0,0.06)] focus-within:ring-2 focus-within:ring-[#B8891B]/20 transition-all duration-300">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-              <div className="flex-1 flex items-center px-3 gap-2">
+              <div className="flex-1 flex items-center px-3 gap-2 relative">
                 <Search className="w-5 h-5 text-[#B8891B] shrink-0" />
                 <input
                   type="text"
                   value={heroSearch}
                   onChange={(e) => setHeroSearch(e.target.value)}
                   placeholder="اكتب كلمة عربية (مثال: شغف، طمأنينة)... أو اختر كلمة وأنشئ شهادتها الرقمية"
-                  className="w-full py-3 text-[16px] sm:text-[18px] bg-transparent outline-none placeholder:text-neutral-450 text-neutral-800 font-bold leading-normal font-heading-arabic"
+                  className="w-full py-3 pl-8 pr-1 text-[16px] sm:text-[18px] bg-transparent outline-none placeholder:text-neutral-450 text-neutral-800 font-bold leading-normal font-heading-arabic"
                   id="hero-word-search"
                 />
+                {heroSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setHeroSearch('')}
+                    className="absolute left-3 text-neutral-400 hover:text-neutral-600 transition-colors p-1.5 rounded-full hover:bg-neutral-100 cursor-pointer flex items-center justify-center"
+                    aria-label="مسح البحث"
+                    id="clear-hero-search-btn"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
               </div>
               <button
                 type="submit"
