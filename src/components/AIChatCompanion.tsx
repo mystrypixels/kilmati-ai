@@ -11,6 +11,8 @@ interface Message {
 
 interface AIChatCompanionProps {
   onSuggestWord: (word: string) => void;
+  externalTriggerPrompt?: string | null;
+  onClearExternalTrigger?: () => void;
 }
 
 const PRESET_QUICK_PROMPTS = [
@@ -36,7 +38,7 @@ const PRESET_QUICK_PROMPTS = [
   }
 ];
 
-export default function AIChatCompanion({ onSuggestWord }: AIChatCompanionProps) {
+export default function AIChatCompanion({ onSuggestWord, externalTriggerPrompt, onClearExternalTrigger }: AIChatCompanionProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -62,6 +64,16 @@ export default function AIChatCompanion({ onSuggestWord }: AIChatCompanionProps)
       setHasNewMessage(false);
     }
   }, [messages, isLoading, isOpen]);
+
+  useEffect(() => {
+    if (externalTriggerPrompt) {
+      setIsOpen(true);
+      handleSendMessage(externalTriggerPrompt);
+      if (onClearExternalTrigger) {
+        onClearExternalTrigger();
+      }
+    }
+  }, [externalTriggerPrompt]);
 
   const handleSendMessage = async (textToSend: string) => {
     if (!textToSend.trim() || isLoading) return;

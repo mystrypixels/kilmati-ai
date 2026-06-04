@@ -10,13 +10,12 @@ import Certificate from './components/Certificate';
 import HowItWorks from './components/HowItWorks';
 import RealExamples from './components/RealExamples';
 import BrandManifesto from './components/BrandManifesto';
-import OurStory from './components/OurStory';
 import CollapsibleFAQ from './components/CollapsibleFAQ';
 import AIChatCompanion from './components/AIChatCompanion';
 import LinguisticNetwork from './components/LinguisticNetwork';
 import AuthProfile from './components/AuthProfile';
 import { classifyArabicWord } from './utils';
-import { Sparkles, MessageCircle, Info, Award, Compass, Search, Gift, ShieldAlert, History, HelpCircle, Flame, DollarSign, CheckCircle } from 'lucide-react';
+import { Sparkles, MessageCircle, Info, Award, Compass, Search, Gift, ShieldAlert, History, HelpCircle, Flame, DollarSign, CheckCircle, FileText, Mail, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import logoImg from './assets/images/kilemati_logo_1780214410083.png';
 
@@ -81,6 +80,39 @@ const getCardStylesForTheme = (theme: string) => {
   }
 };
 
+const DAILY_WORDS = [
+  { word: "الوَجْد", meaning: "نزوع النفس واشتداد الحب حتى يجلب السحر والوجد؛ وهو الغاية القصوى من فيوضات المحبة وأصالتها العشقية التي تتجاوز حواجز الصمت البليغ.", defaultTheme: "ruby" },
+  { word: "الشَّغَف", meaning: "غلاف القلب وجوفه؛ وهو بلوغ الحب أقصى تلافيف الفؤاد واستيقاظ المشاعر بجمال وتلهف رفيع يفيض وجداً وألقاً.", defaultTheme: "gold" },
+  { word: "اليَقِين", meaning: "العلم الراسخ الذي لا يتطرق إليه شك، وهدوء الفؤاد واطمئنانه لحقيقة الأمور وثباتها النبيل في طمأنينة تامة.", defaultTheme: "sapphire" },
+  { word: "السَّمَاحَة", meaning: "بذل ما لا يجب تفضلاً، وسهولة المعاملة وعظمة النفس في الصفح والمودة دون تكلف أو انتظار مقابل.", defaultTheme: "emerald" },
+  { word: "الوِفَاء", meaning: "ملازمة العهد والصدق فيه، وثبات القلوب على المحبة الصافية والوفاء بالعهود والوعود في كل مقام ومقال.", defaultTheme: "onyx" },
+  { word: "النَّبَالَة", meaning: "شرف النفس وعزة الأخلاق، وترفع الفؤاد عن الصغائر مع نبل الخصال وبهاء الحضور الإنساني والأدبي الفخم.", defaultTheme: "gold" },
+  { word: "البُشْرَى", meaning: "الخبر المفرح السار الذي يجلب البهجة والسرور لثنايا الروح ويملأ الدنيا أملاً وتفاؤلاً بما عند الله.", defaultTheme: "emerald" },
+  { word: "الهُيَام", meaning: "أشد درجات الحب الوجداني الذي يذهب بالعقل من فرط الوجد والوله، واندماج الروح بالجمال البشري والكوني الخالد.", defaultTheme: "ruby" },
+  { word: "السَّكِينَة", meaning: "الهدوء والوقار والطمأنينة التي تتنزل على قلوب المخلصين فتجعلهم في سلام داخلي ووئام مع الوجود.", defaultTheme: "sapphire" },
+  { word: "النَّقَاء", meaning: "خلوص الفؤاد من الشوائب والضغينة، والصدق العذب الذي يتجلى في الكلمات والأفعال البهية كالمطر الطاهر.", defaultTheme: "emerald" },
+  { word: "الجَلَد", meaning: "قوة الاحتمال والصبر الجميل في مواجهة الشدائد والخطوب بثبات ووقار يبعث المهابة في النفوس الدانية والقاصية.", defaultTheme: "onyx" },
+  { word: "المَوَدَّة", meaning: "أرقى درجات المحبة وأصفى قنواتها، وهي الألفة الرحيمة والتقارب الصادق بين الأرواح برباط وثيق.", defaultTheme: "ruby" },
+  { word: "الرَّصَانَة", meaning: "جودة الفكر والوقار والرزانة في القول والعمل، واتزان العقل في تقدير الأمور الثمينة وحفظ العهود.", defaultTheme: "onyx" },
+  { word: "الوَلَه", meaning: "شدة الحزن أو شدة الفرح والتعلق بجمال المحبوب حتى يغلب على الوعي رقة وعشقاً فياضاً يسحر الألباب.", defaultTheme: "ruby" },
+  { word: "الرَّجَاء", meaning: "ترقب الفؤاد للخير والرحمة بنور الأمل، وتطلع الروح الدافئ بمستقبل مشرق ووديد يتجاوز عثرات الحاضر.", defaultTheme: "gold" },
+  { word: "البَهَاء", meaning: "لمعان الحسن والروعة الممزوجة بالهيبة، وهو الإشراق الخالص الذي ينفذ إلى وجدان الرائي ببريق مذهل.", defaultTheme: "gold" },
+  { word: "الأَصَالَة", meaning: "عراقة المنبت ورسوخ المجد، والتمسك بالقيم العالية والثابتة التي لا تزعزعها السنون وصروف الدهر المتغيرة.", defaultTheme: "sapphire" },
+  { word: "الضِّيَاء", meaning: "النور الساطع الذي يصفي العتمة ويكشف معالم الجمال، وينير طريق السائرين بالنبل في دروب الفضيلة.", defaultTheme: "emerald" },
+  { word: "الحِكْمَة", meaning: "منتهى التبصر والعدل ووضع كل أمر في موضعه اللائق بوقار وحنكة العارف البصير المنصف الخبير.", defaultTheme: "onyx" },
+  { word: "السَّنَا", meaning: "الضوء اللامع الساطع المرتفع في الأفق، وهو بريق الأمل والمجد المشرق الذي يراه الجميع ببهاء وعظمة.", defaultTheme: "gold" },
+  { word: "الشَّهَامَة", meaning: "عزة النفس وإقالتها للعثرات، والمسارعة لنجدة المكروب وحماية العهود بنخوة الأحرار وأصالة الوجدان العربي.", defaultTheme: "sapphire" },
+  { word: "الخُلُود", meaning: "دوام الأثر والبقاء في ذاكرة الزمان، وهو تخليد الصفات العاطفية والوجدانية الرفيعة لتظل منارة ملهمة للأجيال.", defaultTheme: "onyx" },
+  { word: "الحَنَان", meaning: "رقة القلب وعطفه الفياض، والنسمة الدافئة التي تداوي جراح الروح الشاكية باللطف واللين والمحبة العميقة.", defaultTheme: "ruby" },
+  { word: "العَدْل", meaning: "سيد الفضائل وأساس الملك، وهو ميزان الحق والقسط الذي تشرق به الأوطان وتطمئن به النفوس والقلوب الحيرى.", defaultTheme: "emerald" },
+  { word: "الجُود", meaning: "بذل المجهود بالبهجة والسرور لأجل إسعاد الآخرين، وسخاء النفس التلقائي بغير مقابل رغبة ببقاء الأثر السامي.", defaultTheme: "gold" },
+  { word: "الهِمَّة", meaning: "عزيمة الروح وقوة الإرادة التي تتخطى المصاعب وتطأ النجوم سمواً وشموخاً لا ينكسر تحت وطأة الشدائد.", defaultTheme: "emerald" },
+  { word: "الوَقَار", meaning: "الرزانة والسكينة والهيبة التي تكسو صاحبها رداء الاحترام وتبث في النفوس إكباراً ومهابة وحسن تقدير.", defaultTheme: "onyx" },
+  { word: "الأُنْس", meaning: "طمأنينة الفؤاد وطرد الوحشة والهم بصحبة الأحبة ومطالعة الحروف والكلمات الساحرة الدافئة التي تبرئ الفؤاد.", defaultTheme: "ruby" },
+  { word: "الصَّفَاء", meaning: "خلوص الروح من كدر الضغائن والهموم، وعودة الفؤاد كمرآة مصقولة تعكس بهاء الحياة ونور الفطرة.", defaultTheme: "sapphire" },
+  { word: "العِشْق", meaning: "فرط الحب وتجاوزه المألوف، وهو الاحتراق الشغوف بنور الجمال والتعلق الروحاني الفريد المتصل بأسرار الوجود.", defaultTheme: "ruby" }
+];
+
 export default function App() {
   const [words, setWords] = useState<WordRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -101,6 +133,45 @@ export default function App() {
 
   // Stats
   const [mostRareTheme, setMostRareTheme] = useState('onyx');
+
+  // Chat automated prompt triggering
+  const [chatTriggerPrompt, setChatTriggerPrompt] = useState<string | null>(null);
+
+  // Mouse coordinate tracking for very slow, subtle parallax glows
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  // Calculate remaining time until midnight (next word update)
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0); // Midnight tonight
+      const diff = midnight.getTime() - now.getTime();
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
+      const minutes = Math.floor((diff / (1000 * 60)) % 60).toString().padStart(2, '0');
+      const seconds = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
+      
+      setTimeLeft(`${hours}:${minutes}:${seconds}`);
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({
+        x: (e.clientX / window.innerWidth - 0.5) * 12,
+        y: (e.clientY / window.innerHeight - 0.5) * 12
+      });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   // Load words from backend on mount
   const fetchWords = async () => {
@@ -189,19 +260,42 @@ export default function App() {
     setShowBookingModal(true);
   };
 
-  // Find "الوَجْد" inside the words array (it can have diacritics or plain word)
+  // Dynamic daily selected word of the day
+  const getWordOfTheDay = () => {
+    const today = new Date();
+    const dateString = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+    let hash = 0;
+    for (let i = 0; i < dateString.length; i++) {
+      hash = dateString.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % DAILY_WORDS.length;
+    return DAILY_WORDS[index];
+  };
+
+  const currentDailyWordObj = getWordOfTheDay();
+
+  // Find inside the words array (it can have diacritics or plain word)
   const featuredRecord = words.find(
     w =>
-      w.word === "الوَجْد" ||
-      w.word === "الـوَجْـد" ||
-      w.word.replace(/[ًٌٍَُِّْـ]/g, '') === "الوجد"
+      w.word === currentDailyWordObj.word ||
+      w.word.replace(/[ًٌٍَُِّْـ]/g, '') === currentDailyWordObj.word.replace(/[ًٌٍَُِّْـ]/g, '')
   );
 
-  const featuredTheme = featuredRecord ? featuredRecord.theme : 'ruby'; // Standard default fallback can be ruby (for love)
+  const featuredTheme = featuredRecord ? featuredRecord.theme : currentDailyWordObj.defaultTheme;
   const cardStyle = getCardStylesForTheme(featuredTheme);
 
   return (
-    <div className="min-h-screen bg-parchment selection:bg-amber-100 selection:text-amber-900 font-sans">
+    <div className="min-h-screen bg-parchment selection:bg-amber-100 selection:text-amber-900 font-sans relative overflow-hidden">
+      {/* Subtle glowing parallax spots in the outer container background */}
+      <div 
+        className="absolute top-20 right-[15%] w-[400px] h-[400px] bg-amber-300/5 rounded-full blur-[140px] pointer-events-none -z-10 transition-transform duration-700 ease-out"
+        style={{ transform: `translate(${mousePos.x}px, ${mousePos.y}px)` }}
+      />
+      <div 
+        className="absolute bottom-40 left-[15%] w-[400px] h-[400px] bg-amber-500/5 rounded-full blur-[120px] pointer-events-none -z-10 transition-transform duration-700 ease-out"
+        style={{ transform: `translate(${mousePos.x * -0.8}px, ${mousePos.y * -0.8}px)` }}
+      />
+
       {/* Decorative Top header line */}
       <div className="h-2 bg-gradient-to-r from-neutral-800 via-amber-500 to-neutral-900 w-full animate-pulse"></div>
 
@@ -313,6 +407,22 @@ export default function App() {
             ))}
           </div>
 
+          {/* Simple statistics counter directly under the Hero giving great trust in a small space */}
+          <div className="mt-6 max-w-sm sm:max-w-md mx-auto py-2.5 px-4 bg-white/80 backdrop-blur-sm rounded-2xl border border-stone-200/60 shadow-3xs flex items-center justify-around text-center divide-x divide-x-reverse divide-stone-200/80">
+            <div className="flex-1 px-1">
+              <span className="block text-xs sm:text-sm font-black text-amber-900 leading-none">50,000+</span>
+              <span className="block text-[8.5px] sm:text-[9.5px] text-stone-500 font-extrabold mt-1 font-sans">كلمة مولدة</span>
+            </div>
+            <div className="flex-1 px-2">
+              <span className="block text-xs sm:text-sm font-black text-amber-900 leading-none">2,000+</span>
+              <span className="block text-[8.5px] sm:text-[9.5px] text-stone-500 font-extrabold mt-1 font-sans">أديب ومستخدم</span>
+            </div>
+            <div className="flex-1 px-1">
+              <span className="block text-xs sm:text-sm font-black text-amber-900 leading-none">99.9%</span>
+              <span className="block text-[8.5px] sm:text-[9.5px] text-stone-500 font-extrabold mt-1 font-sans">وقت تشغيل</span>
+            </div>
+          </div>
+
           {/* Featured Word of the Day */}
           <div id="word-of-the-day-card" className="mt-8 max-w-md mx-auto rounded-3xl p-6 text-center space-y-3.5 transition duration-300 group royal-gradient-card border border-amber-500/30 shadow-[0_0_25px_rgba(245,158,11,0.25)] relative overflow-hidden">
             <div className="flex items-center justify-center gap-1.5 text-[10px] px-3 py-1 rounded-full w-max mx-auto leading-none uppercase bg-amber-500/20 text-amber-200 border border-amber-500/30 backdrop-blur-xs font-black">
@@ -320,9 +430,9 @@ export default function App() {
               <span>كَلِمَةُ اليَوْم</span>
             </div>
             <div className="space-y-2">
-              <span className="block text-2xl md:text-3xl font-black font-serif-arabic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-105 to-amber-300 transition duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">« الـوَجْـد »</span>
+              <span className="block text-2xl md:text-3xl font-black font-serif-arabic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-105 to-amber-300 transition duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">« {currentDailyWordObj.word} »</span>
               <p className="text-[12px] font-medium leading-relaxed px-2 font-serif-arabic text-stone-200 drop-shadow-md">
-                "نزوع النفس واشتداد الحب حتى يجلب السحر والوجد؛ وهو الغاية القصوى من فيوضات المحبة وأصالتها العشقية التي تتجاوز حواجز الصمت البليغ."
+                "{currentDailyWordObj.meaning}"
               </p>
             </div>
             {featuredRecord ? (
@@ -335,54 +445,100 @@ export default function App() {
               </button>
             ) : (
               <button
-                onClick={() => startClaimWord("الوَجْد")}
+                onClick={() => startClaimWord(currentDailyWordObj.word)}
                 className="text-[11.5px] font-black text-amber-300 hover:text-amber-100 underline block mx-auto pt-1 h-5 cursor-pointer duration-200 hover:scale-103 drop-shadow-xs"
                 id="word-of-the-day-claim"
               >
-                طالع وأثبت تملك « الـوَجْـد » الآن ✦
+                طالع وأثبت تملك « {currentDailyWordObj.word} » الآن ✦
               </button>
             )}
+
+            {/* Subtle Countdown Timer */}
+            <div className="text-[10px] text-stone-300/65 font-medium font-sans flex items-center justify-center gap-1.5 mt-1 pt-2.5 border-t border-white/5 select-none text-center">
+              <span>تتغير الكلمة تلقائياً بعد:</span>
+              <span className="font-mono text-amber-300 font-extrabold tracking-wider">{timeLeft || "00:00:00"}</span>
+            </div>
           </div>
 
         </div>
 
-        {/* Dynamic statistics overview and informational card */}
-        <div className="pt-2 max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-2xl border border-neutral-100 shadow-xs text-right">
-            <span className="block text-[10px] text-neutral-400">الكلمات المسجلة</span>
-            <span className="text-xl font-extrabold text-neutral-800">{loading ? '...' : words.length}</span>
-            <p className="text-[9.5px] text-neutral-400 mt-1">حيازة سحابية حية</p>
+        {/* Ready-Made Templates section requested by user */}
+        <section id="ready-made-templates" className="max-w-4xl mx-auto pt-6 pb-2 px-4 text-right space-y-4">
+          <div className="flex items-center gap-1.5 justify-start">
+            <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-amber-900 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-full uppercase leading-none">
+              <Sparkles className="w-3 h-3 text-amber-600 animate-pulse animate-spin" style={{ animationDuration: '4s' }} />
+              <span>قِسْمُ النَّمَاذِجِ الجَاهِزَةِ للتَّوْلِيدِ البَلِيغِ</span>
+            </span>
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-base sm:text-lg font-extrabold text-neutral-800 font-sans leading-none">
+              ثق بجمال الحروف في صياغة خطاباتك المتنوعة
+            </h3>
+            <p className="text-[11px] text-stone-500 font-medium">
+              انقر على أي من النماذج الراقية أدناه ليقوم مساعدك الذكي مستشار الكلمات بتطويع البلاغة بلمح البصر:
+            </p>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-neutral-100 shadow-xs text-right">
-            <span className="block text-[10px] text-neutral-400">نظام بايبال ومحمي</span>
-            <span className="text-xs font-bold text-neutral-800 flex items-center gap-1 mt-1">
-              <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-              <span>ضمان فوري وآمن</span>
-            </span>
-            <p className="text-[9.5px] text-neutral-400 mt-1">بطاقة أو PayPal</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {[
+              {
+                title: "كتابة مقال أدبي",
+                desc: "مقال رصين يجسد روح اللغة وبلاغة الفصحى العريقة.",
+                icon: FileText,
+                iconColor: "text-amber-600 bg-amber-50",
+                prompt: "أريد كتابة مقال أدبي فصيح وبليغ للغاية مسترشداً بمقام الكلمات الكبرى بالديوان الوجداني، واشمل فيه بعض الفرائد اللغوية الرصينة."
+              },
+              {
+                title: "منشور لمنصة (X)",
+                desc: "عبارات بليغة رنانة تلامس أسماع ومحبي ومتابعي صفحتك.",
+                icon: Sparkles,
+                iconColor: "text-emerald-700 bg-emerald-50",
+                prompt: "صغ لي ثلاثة منشورات بليغة وجذابة للغاية لمنصة X (تويتر سابقاً) تعبر عن المشاعر الوجدانية العميقة كالشغف والسلام واليقين بنثر ساحر."
+              },
+              {
+                title: "وصف منتج فاخر",
+                desc: "صيغة تسويقية أدبية راقية تبرز فرادة ونفاسة منتجك النبيل.",
+                icon: ShoppingBag,
+                iconColor: "text-purple-600 bg-purple-50",
+                prompt: "أحتاج إلى كتابة وصف تسويقي أدبي فاخر جداً لمنتج نخبوي وراقٍ مستخدماً من أرقى وجواهر البلاغة والمفردات العربية الفصيحة ما يبرز فخامة القيمة."
+              },
+              {
+                title: "رسالة بريد بليغة",
+                desc: "صياغة خطابات رسمية وشخصية رصينة ومؤثرة للاحترام والوفاء.",
+                icon: Mail,
+                iconColor: "text-rose-600 bg-rose-50",
+                prompt: "صغ لي مسودة بريد إلكتروني رسمي رفيع المستوى يفيض بالتقدير والامتنان والاحترام البالغ باللغة العربية الفصحى الشريفة."
+              }
+            ].map((item, index) => {
+              const IconComp = item.icon;
+              return (
+                <button
+                  key={index}
+                  onClick={() => setChatTriggerPrompt(item.prompt)}
+                  className="bg-white border border-stone-200/80 p-3.5 rounded-2xl flex flex-col items-start text-right space-y-2.5 hover:border-neutral-900 hover:shadow-xs duration-300 transition-all cursor-pointer group active:scale-97"
+                  id={`template-btn-${index}`}
+                >
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border border-stone-150/40 ${item.iconColor} group-hover:scale-105 duration-200`}>
+                    <IconComp className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="space-y-1 flex-1 w-full">
+                    <span className="block text-[11px] font-black text-stone-900 transition duration-200 group-hover:text-amber-800 font-sans">
+                      {item.title}
+                    </span>
+                    <p className="text-[10px] text-stone-500 leading-normal font-sans">
+                      {item.desc}
+                    </p>
+                  </div>
+                  <div className="w-full text-left pt-1 px-1 border-t border-stone-100 mt-1">
+                    <span className="text-[9px] font-black text-[#8c6b12] hover:underline inline-flex items-center gap-0.5 font-sans">
+                      جرّب التوليد الآن ✦
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
-
-          <div className="bg-white p-4 rounded-2xl border border-neutral-100 shadow-xs text-right">
-            <span className="block text-[10px] text-neutral-400">ميزة الإهداء الأدبي</span>
-            <span className="text-xs font-bold text-neutral-800 flex items-center gap-1 mt-1">
-              <Gift className="w-3.5 h-3.5 text-rose-500 animate-bounce" />
-              <span>أهدِ صديقك كلمة</span>
-            </span>
-            <p className="text-[9.5px] text-neutral-400 mt-1">بصك ورسالة مخصصة</p>
-          </div>
-
-          <div className="bg-white p-4 rounded-2xl border border-neutral-100 shadow-xs text-right">
-            <span className="block text-[10px] text-neutral-400">طراز الرداء النادر</span>
-            <span className="text-xs font-bold text-amber-700 uppercase block mt-1.5">
-              {mostRareTheme === 'onyx' ? 'العقيق كحيل 🖤' : 
-               mostRareTheme === 'emerald' ? 'الزمرد 💚' : 
-               mostRareTheme === 'gold' ? 'بريق الذهب 💛' : 
-               mostRareTheme === 'sapphire' ? 'الملكي 💙' : 'الياقوت الشغوف ❤️'}
-            </span>
-            <p className="text-[9.5px] text-neutral-400 mt-0.5">ندرة الحجز الحالي</p>
-          </div>
-        </div>
+        </section>
 
       </header>
 
@@ -498,7 +654,6 @@ export default function App() {
           </div>
           
           <BrandManifesto />
-          <OurStory />
         </section>
 
         {/* Collapsible FAQ Section (الأسئلة الشائعة) */}
@@ -643,7 +798,11 @@ export default function App() {
       </AnimatePresence>
 
       {/* Floating AI Chat Companion widget */}
-      <AIChatCompanion onSuggestWord={startClaimWord} />
+      <AIChatCompanion 
+        onSuggestWord={startClaimWord} 
+        externalTriggerPrompt={chatTriggerPrompt}
+        onClearExternalTrigger={() => setChatTriggerPrompt(null)}
+      />
     </div>
   );
 }

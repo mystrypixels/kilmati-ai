@@ -496,13 +496,13 @@ export default function AuthProfile({ words, onSelectWord, onUserAuthChange, onP
 
       {/* Profile & Wallet Drawer/Modal (showing their registered words) */}
       {isProfileModalOpen && currentUser && createPortal(
-        <div className="fixed inset-0 bg-neutral-950/20 backdrop-blur-xs z-[1000] flex items-center justify-center p-0 overflow-hidden w-full h-full" style={{ direction: 'rtl' }}>
-          <div className="bg-[#faf9f6]/98 backdrop-blur-md w-full h-full max-w-full max-h-full rounded-none border-0 shadow-none relative overflow-hidden transition-all duration-300 flex flex-col font-sans">
+        <div className="fixed inset-0 bg-[#faf9f6] z-[1000] flex flex-col w-full h-full min-h-screen overflow-hidden" style={{ direction: 'rtl' }}>
+          <div className="bg-[#faf9f6]/100 w-full h-full flex flex-col font-sans">
             {/* Top decorative visual bar */}
             <div className="h-1.5 bg-gradient-to-r from-neutral-800 via-amber-500 to-neutral-900 w-full shrink-0"></div>
 
             {/* Drawer Header (Full-width Navbar) */}
-            <div className="p-4 sm:p-5 border-b border-neutral-200/60 flex items-center justify-between bg-white shrink-0 shadow-3xs [direction:rtl]">
+            <div className="p-4 sm:p-5 border-b border-neutral-200/80 flex items-center justify-between bg-white shrink-0 shadow-xs [direction:rtl]">
               <div className="flex items-center gap-2.5 sm:gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center font-bold text-amber-800 shadow-3xs">
                   <UserIcon className="w-5 h-5 text-amber-600" />
@@ -533,9 +533,10 @@ export default function AuthProfile({ words, onSelectWord, onUserAuthChange, onP
             </div>
 
             {/* Context/Body area scrolling */}
-            <div className="p-4 sm:p-8 overflow-y-auto space-y-5 sm:space-y-6 flex-1 select-none scrollbar-thin">
-              {/* User Membership Card details */}
-              <div className="bg-gradient-to-br from-neutral-900 via-[#181816] to-[#242421] rounded-2xl p-4 sm:p-6 border border-white/5 shadow-xl text-white relative overflow-hidden text-right">
+            <div className="p-4 sm:p-8 overflow-y-auto flex-1 select-none scrollbar-thin bg-gradient-to-b from-[#faf9f6] to-[#f4f3ef]">
+              <div className="max-w-7xl mx-auto w-full space-y-5 sm:space-y-6">
+                {/* User Membership Card details */}
+                <div className="bg-gradient-to-br from-neutral-900 via-[#181816] to-[#242421] rounded-2xl p-4 sm:p-6 border border-white/5 shadow-xl text-white relative overflow-hidden text-right">
                 {/* Visual decoration overlay */}
                 <div className="absolute top-1/2 left-4 -translate-y-1/2 opacity-10 blur-xs">
                   <Award className="w-32 h-32 text-amber-400" />
@@ -886,7 +887,8 @@ export default function AuthProfile({ words, onSelectWord, onUserAuthChange, onP
               </div>
             </div> {/* End of Left Column */}
           </div> {/* End of Grid container */}
-        </div> {/* End of Context/Body area scrolling */}
+              </div>
+            </div> {/* End of Context/Body area scrolling */}
 
         {/* Bottom Footer block */}
             <div className="p-4 bg-white border-t border-neutral-200/50 text-center">
