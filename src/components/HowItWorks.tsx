@@ -14,7 +14,7 @@ export default function HowItWorks() {
           كيف يعمل ديوان كِلْمَتِي؟
         </h3>
         <p className="text-xs text-neutral-400 font-sans max-w-2xl mx-auto leading-relaxed">
-          ثلاث خطوات بسيطة للغاية تفصلك عن حيازة كملك اللغوي وتوثيقه في السجل العام للأبد بشهادة رقمية فاخرة.
+          ثلاث خطوات بسيطة للغاية تفصلك عن تصميم وثيقتك اللغوية وتوثيقها في السجل العام بشهادة رقمية فاخرة.
         </p>
       </div>
 
@@ -47,9 +47,9 @@ export default function HowItWorks() {
             </span>
           </div>
           <div className="space-y-1.5 px-2">
-            <h4 className="text-sm font-bold text-neutral-200 font-sans">02. ادفع بأمان فوري</h4>
+            <h4 className="text-sm font-bold text-neutral-200 font-sans">02. أكمل الطلب مباشرة</h4>
             <p className="text-[11.5px] text-neutral-400 font-sans leading-relaxed">
-              أكمل عملية الشراء والدفع الآمن عبر PayPal أو البطاقة لغير المشتركين بنقرة واحدة عبر بوابتنا المعتمدة. تصبح الكلمة ملكك في التو واللحظة.
+              أكمل عملية التسجيل والدفع الآمن عبر PayPal أو بطاقتك لتأكيد طلبك وتوليد خصائص الشهادة مباشرة بنقرة واحدة.
             </p>
           </div>
         </div>
@@ -66,9 +66,9 @@ export default function HowItWorks() {
             </span>
           </div>
           <div className="space-y-1.5 px-2">
-            <h4 className="text-sm font-bold text-neutral-200 font-sans">03. امتلك إلى الأبد</h4>
+            <h4 className="text-sm font-bold text-neutral-200 font-sans">03. استلام الشهادة الرقمية</h4>
             <p className="text-[11.5px] text-neutral-400 font-sans leading-relaxed">
-              احصل على صك موثوق بالذكاء الاصطناعي وشهادة بالنمط الفاخر المختار. شاركها، حملها، أو قدمها كهدية مخصصة تبقى خالدة لمن تحب.
+              احصل على شهادتك الأدبية الرقمية الفاخرة مصاغة بالذكاء الاصطناعي بالنمط المختار. شاركها، حملها، أو قدمها كهدية مخصصة تبقى خالدة لمن تحب.
             </p>
           </div>
         </div>

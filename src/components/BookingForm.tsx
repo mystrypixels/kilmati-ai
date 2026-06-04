@@ -416,7 +416,7 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
     }
 
     if (!trimmedEmail) {
-      setErrorMSG("يرجى إدخال عنوان بريد إلكتروني صالح للمراسلات واستلام صكوك الملكيات.");
+      setErrorMSG("يرجى إدخال عنوان بريد إلكتروني صالح للمراسلات واستلام الشهادات الرقمية.");
       return;
     }
 
@@ -443,12 +443,12 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
           </span>
         </div>
         <h3 className="text-lg md:text-xl font-bold font-sans">
-          {phase === 'payment' ? 'بوابة سداد الرسوم الآمنة عبر PayPal' : 'تسجيل ملكية الكلمة الرمزية'}
+          {phase === 'payment' ? 'بوابة سداد الرسوم الآمنة عبر PayPal' : 'توثيق الكلمة وإنشاء شهادة رقمية'}
         </h3>
         <p className="text-xs text-neutral-400 mt-1 leading-relaxed font-sans">
           {phase === 'payment' 
-            ? 'سدد رسم الحيازة الرمزية لتوليد الصك الفاخر وتسجيل الكلمة باسمك في قاعدة البيانات السحابية برعاية PayPal.'
-            : 'اختر باقة التوثيق، وصغ بلمحات الذكاء الاصطناعي معانٍ شاعريّة تُسجّل لأول مرة وتصان ضد التكرار للأبد.'
+            ? 'أكمل الطلب لتوليد الشهادة الرقمية الفاخرة المعتمدة برعاية PayPal.'
+            : 'اختر باقة التوثيق، وصغ معانٍ شاعريّة لتصميم شهادتك الرقمية الفاخرة.'
           }
         </p>
       </div>
@@ -490,7 +490,7 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
                 </span>
               </div>
               <p className="text-[11px] text-neutral-500 leading-relaxed font-sans">
-                💡 بمجرد تسجيل الكلمة رمزياً باسم المالك، يُغلق باب حيازتها لغيره في ديوان كِلْمَتِي الموثق، ويصدُر لها صك تاريخي بنسق وخط فريد.
+                💡 بمجرد تسجيل الكلمة رمزياً باسم المالك، يُغلق باب حيازتها لغيره في ديوان كِلْمَتِي الموثق، ويصدُر لها شهادة رقمية تاريخية بنسق وخط فريد.
               </p>
             </div>
 
@@ -555,7 +555,7 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
             ) : (
               <div className="bg-amber-500/5 border border-amber-500/15 rounded-2xl p-3.5 text-right flex items-center gap-2 font-sans">
                 <p className="text-[10px] text-amber-900 font-medium leading-relaxed">
-                  💡 <strong>ملاحظة هامة:</strong> ننصح بـ <strong className="text-amber-950 underline font-black">تسجيل العضوية أو تسجيل الدخول</strong> من أعلى الصفحة أولاً؛ ليتسنى لك حفظ الصك وإيجاد كلماتك في ملفك الشخصي لاحقاً في أي وقت.
+                  💡 <strong>ملاحظة هامة:</strong> ننصح بـ <strong className="text-amber-950 underline font-black">تسجيل العضوية أو تسجيل الدخول</strong> من أعلى الصفحة أولاً؛ ليتسنى لك حفظ الشهادة وإيجاد كلماتك في ملفك الشخصي لاحقاً في أي وقت.
                 </p>
               </div>
             )}
@@ -563,7 +563,7 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
              {/* Owner Credentials & Countries selection */}
              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 font-sans">
                <div className="space-y-1.5 sm:col-span-2">
-                 <label className="block text-xs font-bold text-neutral-700 font-sans">اسم مالك الصك المقيد بالوثيقة:</label>
+                 <label className="block text-xs font-bold text-neutral-700 font-sans">اسم مالك الشهادة المقيد بالوثيقة:</label>
                  <div className="relative">
                    <span className="absolute inset-y-0 right-3 flex items-center text-[#9c7717]">
                      <User className="w-4 h-4" />
@@ -726,7 +726,7 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
                    {/* Right column: Highlights and features */}
                    <div className="space-y-2 bg-white p-4 border border-neutral-150 rounded-xl flex flex-col justify-between font-sans">
                      <div>
-                       <span className="block text-[11px] font-bold text-neutral-500 mb-2">المزايا والحقوق المكفولة لحيازتك:</span>
+                       <span className="block text-[11px] font-bold text-neutral-500 mb-2">المميزات المشمولة في شهادتك الأدبية:</span>
                        <ul className="space-y-2 text-[11px] text-neutral-700 font-semibold">
                          {wordClassification.features.map((feat, fidx) => (
                            <li key={fidx} className="flex items-center justify-end gap-1.5 text-right w-full">
@@ -737,7 +737,7 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
                        </ul>
                      </div>
                      <p className="text-[10px] text-amber-900 bg-amber-50/70 rounded-lg p-2 border border-amber-200/50 leading-relaxed font-sans text-right mt-2">
-                       💡 يتم قفل حيازة الكلمة بالكامل باسمك في ديوان كلمتي المعتمد سحابياً للأبد لمنع التكرار وتوليد الصك فور إتمام السداد.
+                       💡 يتم توثيق الكلمة باسمك في ديوان كلمتي وتوليد الشهادة الرقمية مباشرة فور إتمام السداد.
                      </p>
                    </div>
 
@@ -818,7 +818,7 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-neutral-200/60 pb-2">
                    <span className="text-[10px] text-amber-900 bg-amber-100/65 border border-amber-200/50 font-black px-2 py-0.5 rounded-full inline-flex items-center gap-1 leading-none shadow-3xs self-start">
                      <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span>
-                     معاينة حية ومثال لشكل صك التوثيق الجديد الخاص بك
+                     معاينة حية ومثال لشكل الشهادة الرقمية للتمليك الخاصة بك
                    </span>
                    <span className="text-[9px] sm:text-[10px] text-neutral-400 font-bold font-sans self-end sm:self-center">النمط المفعل: {
                      selectedTheme === 'gold' ? 'الدِّيوَانُ الذَّهَبِيُّ' :
@@ -947,7 +947,7 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
                            </div>
                            {/* Certificate Number mock */}
                            <div className="text-left">
-                             <span className="text-[6.5px] sm:text-[7px] text-neutral-400 block">رقم الصك السحابي</span>
+                             <span className="text-[6.5px] sm:text-[7px] text-neutral-400 block">رقم الشهادة الرقمية</span>
                              <span className="font-mono text-[7.5px] sm:text-[8px] font-bold text-stone-700">OWN-{(word.trim() || 'WORD').toUpperCase()}-XXXX</span>
                            </div>
                          </div>
@@ -1055,7 +1055,7 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
               {!sdkLoaded && !sdkError && (
                 <div className="py-10 text-center space-y-3">
                   <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
-                  <p className="text-xs font-bold text-neutral-500 font-sans">جاري استدعاء وتجهيز منصة الدفع الآمنة PayPal لإنشاء الصك...</p>
+                  <p className="text-xs font-bold text-neutral-500 font-sans">جاري استدعاء وتجهيز منصة الدفع الآمنة PayPal لإنشاء الشهادة...</p>
                 </div>
               )}
 
@@ -1063,7 +1063,7 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
                 <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 leading-relaxed space-y-2">
                   <p className="font-bold">⚠️ تعذر تحميل واجهة PayPal الخارجية حالياً.</p>
                   <p className="text-[11px] text-neutral-600">
-                    يمكنك دوماً حجز وامتلاك الكلمة تجريبياً وسحابياً عبر زر المحاكاة الفوري بالأسفل لتجاوز الخطوة بنجاح بنقرة واحدة!
+                    يمكنك دوماً حجز وتصميم الشهادة تجريبياً عبر زر المحاكاة الفوري بالأسفل لتجاوز الخطوة بنجاح بنقرة واحدة!
                   </p>
                 </div>
               )}
@@ -1088,7 +1088,7 @@ export default function BookingForm({ onSuccess, onCancel, prefilledWord = '' }:
                 id="dev-simulate-pay-btn"
               >
                 <Sparkles className="w-4 h-4 text-amber-500 animate-pulse shrink-0" />
-                <span className="leading-normal">محاكاة دفع سحابية سريعة وتأكيد تسجيل وتمليك الكلمة</span>
+                <span className="leading-normal">محاكاة دفع سريعة وتأكيد إصدار الشهادة الرقمية مباشرة</span>
               </button>
             </div>
 

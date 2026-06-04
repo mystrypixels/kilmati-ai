@@ -1,9 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@300;400;500;600;700;800&family=Reem+Kufi:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@300;400;500;600;700;800;950&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&family=Reem+Kufi:wght@400;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-serif-arabic: "Amiri", serif;
   --font-kufi: "Reem Kufi", sans-serif;
+  --font-heading-arabic: "IBM Plex Sans Arabic", "Cairo", sans-serif;
+  --font-body-arabic: "Tajawal", "Cairo", sans-serif;
   --font-sans-arabic: "Cairo", sans-serif;
   --animate-fade-in-up: fade-in-up 0.5s ease-out forwards;
 }
@@ -39,18 +41,18 @@
 }
 
 .bg-parchment {
-  background-color: #fdfdfb;
-  background-image: radial-gradient(#e2dac3 0.6px, transparent 0.6px), radial-gradient(#e2dac3 0.6px, #fdfdfb 0.6px);
+  background-color: #FAF8F3;
+  background-image: radial-gradient(#e0d9c1 0.5px, transparent 0.5px), radial-gradient(#e0d9c1 0.5px, #FAF8F3 0.5px);
   background-size: 24px 24px;
   background-position: 0 0, 12px 12px;
-  animation: subtle-dot-flow 180s linear infinite;
+  animation: subtle-dot-flow 240s linear infinite;
 }
 
 body {
-  font-family: var(--font-sans-arabic);
+  font-family: var(--font-body-arabic);
   direction: rtl;
-  background-color: #f7f6f0;
-  color: #2d2a26;
+  background-color: #FAF8F3;
+  color: #18181B;
 }
 
 @keyframes gradient-move {
@@ -66,7 +68,7 @@ body {
 }
 
 .royal-gradient-card {
-  background: linear-gradient(135deg, #2d0615, #4c0519, #1e1b4b, #2e1065, #451a03);
+  background: linear-gradient(135deg, #1e1b4b, #311c08, #451a03, #1c1917);
   background-size: 400% 400%;
-  animation: gradient-move 18s ease infinite;
+  animation: gradient-move 22s ease infinite;
 }

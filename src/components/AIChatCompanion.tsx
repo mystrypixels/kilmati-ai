@@ -40,6 +40,7 @@ const PRESET_QUICK_PROMPTS = [
 
 export default function AIChatCompanion({ onSuggestWord, externalTriggerPrompt, onClearExternalTrigger }: AIChatCompanionProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
@@ -59,6 +60,13 @@ export default function AIChatCompanion({ onSuggestWord, externalTriggerPrompt, 
   };
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     if (isOpen) {
       scrollToBottom();
       setHasNewMessage(false);
@@ -67,6 +75,7 @@ export default function AIChatCompanion({ onSuggestWord, externalTriggerPrompt, 
 
   useEffect(() => {
     if (externalTriggerPrompt) {
+      setIsVisible(true);
       setIsOpen(true);
       handleSendMessage(externalTriggerPrompt);
       if (onClearExternalTrigger) {
@@ -169,6 +178,8 @@ export default function AIChatCompanion({ onSuggestWord, externalTriggerPrompt, 
     return found.slice(0, 3);
   };
 
+  if (!isVisible) return null;
+
   return (
     <>
       {/* Floating Action Trigger Button - Pin fixed to bottom-right with high priority index */}
@@ -182,11 +193,11 @@ export default function AIChatCompanion({ onSuggestWord, externalTriggerPrompt, 
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 20, scale: 0.9 }}
               onClick={() => setIsOpen(true)}
-              className="hidden md:flex items-center gap-2 bg-gradient-to-r from-neutral-900 to-stone-900 text-neutral-100 border border-amber-500/30 px-4 py-2.5 rounded-2xl shadow-2xl cursor-pointer hover:border-amber-400 select-none transition group"
+              className="hidden md:flex items-center gap-2 bg-gradient-to-r from-neutral-900 to-stone-900 text-neutral-100 border border-amber-500/30 px-3 py-1.5 rounded-xl shadow-xl cursor-pointer hover:border-amber-400 select-none transition group"
             >
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></div>
-              <span className="text-xs font-bold font-sans text-neutral-200">مُستشار الكلمات الأدبي ✍🏼</span>
-              <span className="text-[10px] text-amber-400 font-bold bg-amber-400/10 px-1.5 py-0.5 rounded-lg border border-amber-400/20 group-hover:bg-amber-400/20 duration-300">اسألني</span>
+              <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></div>
+              <span className="text-[11px] font-bold font-sans text-neutral-200">مُستشار الكلمات ✍🏼</span>
+              <span className="text-[9px] text-amber-400 font-bold bg-amber-400/10 px-1 py-0.5 rounded-md border border-amber-400/20 group-hover:bg-amber-400/20 duration-300">اسألني</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -194,10 +205,10 @@ export default function AIChatCompanion({ onSuggestWord, externalTriggerPrompt, 
         {/* Floating Bubble Badge Trigger */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`w-14 h-14 rounded-full flex items-center justify-center relative shadow-2xl transition duration-300 cursor-pointer overflow-hidden border ${
+          className={`w-11 h-11 rounded-full flex items-center justify-center relative shadow-xl transition duration-300 cursor-pointer overflow-hidden border ${
             isOpen 
               ? 'bg-neutral-950 border-white/20 text-white rotate-90' 
-              : 'bg-amber-400 hover:bg-amber-300 border-amber-500/20 text-neutral-950 scale-100 hover:scale-110'
+              : 'bg-amber-400 hover:bg-amber-300 border-amber-500/20 text-neutral-950 scale-100 hover:scale-105'
           }`}
           title="افتح محادثة مستشار الكلمات والأدب"
           id="ai-floating-chat-trigger"
@@ -208,13 +219,13 @@ export default function AIChatCompanion({ onSuggestWord, externalTriggerPrompt, 
           )}
 
           {isOpen ? (
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           ) : (
             <div className="relative">
-              <MessageCircle className="w-6 h-6" />
+              <MessageCircle className="w-5 h-5" />
               {/* Pulsating notification dot when there's an unseen message from previous turns */}
               {hasNewMessage && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 border-2 border-amber-400 animate-ping"></span>
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-amber-400 animate-ping"></span>
               )}
             </div>
           )}

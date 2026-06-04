@@ -14,10 +14,10 @@ import CollapsibleFAQ from './components/CollapsibleFAQ';
 import AIChatCompanion from './components/AIChatCompanion';
 import LinguisticNetwork from './components/LinguisticNetwork';
 import AuthProfile from './components/AuthProfile';
+import TrustSection from './components/TrustSection';
 import { classifyArabicWord } from './utils';
 import { Sparkles, MessageCircle, Info, Award, Compass, Search, Gift, ShieldAlert, History, HelpCircle, Flame, DollarSign, CheckCircle, FileText, Mail, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import logoImg from './assets/images/kilemati_logo_1780214410083.png';
 
 const POPULAR_WORDS_LIST = [
   { word: "حُبّ", tier: "بلاتينية", price: 15, color: "text-red-700 bg-red-50 border-red-100" },
@@ -285,168 +285,116 @@ export default function App() {
   const cardStyle = getCardStylesForTheme(featuredTheme);
 
   return (
-    <div className="min-h-screen bg-parchment selection:bg-amber-100 selection:text-amber-900 font-sans relative overflow-hidden">
-      {/* Subtle glowing parallax spots in the outer container background */}
-      <div 
-        className="absolute top-20 right-[15%] w-[400px] h-[400px] bg-amber-300/5 rounded-full blur-[140px] pointer-events-none -z-10 transition-transform duration-700 ease-out"
-        style={{ transform: `translate(${mousePos.x}px, ${mousePos.y}px)` }}
-      />
-      <div 
-        className="absolute bottom-40 left-[15%] w-[400px] h-[400px] bg-amber-500/5 rounded-full blur-[120px] pointer-events-none -z-10 transition-transform duration-700 ease-out"
-        style={{ transform: `translate(${mousePos.x * -0.8}px, ${mousePos.y * -0.8}px)` }}
-      />
-
-      {/* Decorative Top header line */}
-      <div className="h-2 bg-gradient-to-r from-neutral-800 via-amber-500 to-neutral-900 w-full animate-pulse"></div>
-
-      {/* Premium Top Navigation Bar with Logo */}
-      <nav id="kilemati-top-nav" className="bg-white/75 backdrop-blur-md border-b border-neutral-200/50 sticky top-0 z-50 transition-all duration-300 w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[4.5rem] py-3 sm:py-0 flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Logo Emblem */}
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-stone-100 flex items-center justify-center shadow-md border border-neutral-200/50 relative overflow-hidden group shrink-0">
-              <img src={logoImg} alt="شعار منصة كلمتي" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" referrerPolicy="no-referrer" />
+    <div className="min-h-screen bg-parchment selection:bg-amber-100 selection:text-amber-900 font-sans relative overflow-hidden pb-10">
+      {/* Top Beautiful Sticky Navigation Bar */}
+      <nav className="w-full bg-white/75 backdrop-blur-md border-b border-neutral-200/50 sticky top-0 z-[100] transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between [direction:rtl]">
+          {/* Logo Brand / Beautiful Connected Text */}
+          <div className="flex items-center gap-2 sm:gap-3 select-none cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-500/5 border border-amber-500/20 flex items-center justify-center font-bold text-base sm:text-lg text-amber-850 shadow-3xs hover:scale-105 active:scale-95 duration-200 shrink-0 select-none">
+              ✒️
             </div>
-            
-            {/* Logo Wordmark "كلمتي" (Kilmati) */}
             <div className="flex flex-col text-right">
-              <span className="font-serif-arabic text-lg sm:text-xl md:text-2xl font-black text-neutral-800 tracking-tight flex items-center gap-1.5 sm:gap-2">
-                كِلْمَتِي <span className="text-amber-600 text-[9px] sm:text-[10px] font-sans px-1.5 py-0.5 bg-amber-50 rounded border border-amber-200/50 uppercase font-black tracking-widest leading-none">Kilmati</span>
+              <span className="text-xl sm:text-2xl font-black text-[#9c7717] font-serif-arabic select-none leading-tight">
+                كِلْمَتِي
               </span>
-              <span className="text-[10px] text-neutral-500 font-medium hidden sm:block">المنصة الملكية لتوثيق الكلمات والمشاعر العربية الفصيحة</span>
+              <span className="text-[8px] sm:text-[9.5px] text-neutral-400 font-bold hidden xs:inline mt-0.5 sm:mt-1 uppercase">
+                ديوان الحروف الرقمية
+              </span>
             </div>
           </div>
-          
-          {/* Quick links & active indicator */}
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="hidden md:flex items-center gap-4">
-              <span className="text-xs text-neutral-400 font-medium flex items-center gap-1.5 font-sans">
-                <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                السجلات السحابية نشطة
-              </span>
-              <button
-                onClick={() => {
-                  const el = document.getElementById("words-wall");
-                  el?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="text-xs text-amber-800 bg-amber-50 hover:bg-amber-100/80 font-bold px-3.5 py-2 rounded-xl border border-amber-200 transition-all duration-300 font-sans"
-              >
-                طالع ديوان الكلمات
-              </button>
-            </div>
 
-            {/* User Literary Membership Accounts */}
-            <AuthProfile 
-              words={words} 
-              onSelectWord={(word) => setSelectedWord(word)} 
-              onProfileUpdated={fetchWords}
-            />
+          {/* Members Auth Portal / User Profile button */}
+          <div className="flex items-center gap-2">
+            <AuthProfile words={words} onSelectWord={setSelectedWord} onProfileUpdated={fetchWords} />
           </div>
         </div>
       </nav>
 
+      {/* Subtle glowing parallax spots in the outer container background */}
+      <div 
+        className="absolute top-20 right-[15%] w-[300px] h-[300px] bg-amber-300/5 rounded-full blur-[50px] pointer-events-none -z-10 transition-transform duration-700 ease-out"
+        style={{ transform: `translate(${mousePos.x}px, ${mousePos.y}px)` }}
+      />
+      <div 
+        className="absolute bottom-40 left-[15%] w-[250px] h-[250px] bg-amber-500/5 rounded-full blur-[45px] pointer-events-none -z-10 transition-transform duration-700 ease-out"
+        style={{ transform: `translate(${mousePos.x * -0.8}px, ${mousePos.y * -0.8}px)` }}
+      />
+
       {/* Hero Banner Grid layout */}
-      <header className="relative py-12 md:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 overflow-hidden">
+      <header className="relative pt-12 sm:pt-16 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 overflow-hidden">
         
-        {/* Floating background shape */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-amber-100/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
-        
-        {/* Accent Emblem */}
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white border border-neutral-200 shadow-md mb-1 relative">
-          <Award className="w-7 h-7 text-[#9c7717]" />
-          <div className="absolute inset-1 rounded-full border border-dashed border-amber-300/40"></div>
+        {/* Logo Shield / Branding - Beautiful connected non-cut Arabic brand */}
+        <div className="flex flex-col items-center justify-center space-y-2 select-none mb-1.5">
+          <div className="text-4xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#B8891B] via-[#E2B33A] to-[#996e11] hover:scale-102 transition-transform duration-300 pointer-events-none drop-shadow-3xs font-serif-arabic select-none py-2 leading-normal">
+            كِلْمَتِي
+          </div>
+          <span className="text-[10px] sm:text-xs font-black tracking-wide text-[#B8891B]/80 font-heading-arabic uppercase">
+            المنصة السحابية الموثوقة لحيازة كلمات لغة الضاد
+          </span>
         </div>
 
-        {/* Brand visual text typography: Extremely clean and regular fonts for best legibility */}
-        <div className="space-y-3">
-          <h1 className="text-3xl md:text-5xl font-black tracking-tight text-neutral-800 leading-tight">
-            بوابة ملكية الكلمات العربية الفصيحة
+        {/* Brand visual typography (Stage 1.2 Copywriting) */}
+        <div className="space-y-4 max-w-3xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-neutral-800 leading-tight font-heading-arabic">
+            أنشئ شهادة رقمية فريدة لكلماتك
           </h1>
-          <p className="text-xs md:text-sm text-neutral-500 font-medium max-w-2xl mx-auto leading-relaxed">
-             سجل ملكيتك الأدبية والوجدانة لأي كلمة في لغة الضاد. توليد بلاغي فوري فائق الجمال بالذكاء الاصطناعي مع إصدار صك توثيق عريض وحفظ رقمي سحابي خالد ضد التكرار.
+          <p className="text-sm sm:text-base text-neutral-600 font-medium leading-relaxed max-w-2xl mx-auto font-body-arabic">
+            أنشئ وصفاً أدبياً لكلمتك واحصل على شهادة رقمية فريدة بالذكاء الاصطناعي
           </p>
         </div>
 
-        {/* Dynamic unified search box */}
-        <div className="max-w-xl mx-auto">
-          <form onSubmit={handleHeroSearchSubmit} className="relative group/search bg-white p-1.5 rounded-2xl border border-neutral-200 shadow-sm focus-within:ring-2 focus-within:ring-amber-500/20 transition-all duration-300">
-            <div className="flex items-center">
-              <span className="pr-3 text-neutral-400">
-                <Search className="w-5 h-5 text-amber-600" />
-              </span>
-              <input
-                type="text"
-                value={heroSearch}
-                onChange={(e) => setHeroSearch(e.target.value)}
-                placeholder="ابحث عن كلمتك المفضلة لتملكها... (مثال: شغف، طمأنينة)"
-                className="w-full py-3 px-2 text-xs bg-transparent outline-none placeholder:text-neutral-400 text-neutral-800 font-bold"
-                id="hero-word-search"
-              />
+        {/* Dynamic unified search box (Stage 1.1 / 6 Mobile version) */}
+        <div className="max-w-xl mx-auto pt-4">
+          <form onSubmit={handleHeroSearchSubmit} className="relative group/search bg-white p-1.5 rounded-[24px] border border-neutral-200/80 shadow-[0_10px_30px_rgba(0,0,0,0.06)] focus-within:ring-2 focus-within:ring-[#B8891B]/20 transition-all duration-300">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div className="flex-1 flex items-center px-3 gap-2">
+                <Search className="w-5 h-5 text-[#B8891B] shrink-0" />
+                <input
+                  type="text"
+                  value={heroSearch}
+                  onChange={(e) => setHeroSearch(e.target.value)}
+                  placeholder="اكتب كلمة عربية (مثال: شغف، طمأنينة)... أو اختر كلمة وأنشئ شهادتها الرقمية"
+                  className="w-full py-3 text-[16px] sm:text-[18px] bg-transparent outline-none placeholder:text-neutral-450 text-neutral-800 font-bold leading-normal font-heading-arabic"
+                  id="hero-word-search"
+                />
+              </div>
               <button
                 type="submit"
-                className="bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold px-6 py-3 rounded-xl transition-all duration-300 shrink-0 shadow-md hover:shadow-[0_0_15px_rgba(245,158,11,0.6)] focus:ring-2 focus:ring-amber-500/40"
+                className="bg-neutral-900 hover:bg-neutral-800 text-white text-xs sm:text-sm font-extrabold px-8 py-3 sm:py-0 h-12 sm:h-14 rounded-2xl transition-all duration-300 shrink-0 shadow-md flex items-center justify-center gap-1.5 cursor-pointer font-heading-arabic"
                 id="hero-claim-submit"
               >
-                تحقق وامتلك
+                <span>أنشئ شهادتي</span>
               </button>
             </div>
           </form>
 
-          {/* Quick experiment suggestions */}
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5 text-[11px] text-neutral-400 font-medium">
-            <span>اقتراحات الحروف:</span>
-            {['شَرَف', 'رُؤْيَة', 'مَجْد', 'كَرَامَة', 'تَسَامُح'].map((keyword) => (
-              <button
-                key={keyword}
-                onClick={() => startClaimWord(keyword)}
-                className="px-2 py-0.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 rounded-md border border-neutral-200/40 transition"
-                id={`suggested-word-${keyword}`}
-              >
-                « {keyword} »
-              </button>
-            ))}
-          </div>
-
-          {/* Simple statistics counter directly under the Hero giving great trust in a small space */}
-          <div className="mt-6 max-w-sm sm:max-w-md mx-auto py-2.5 px-4 bg-white/80 backdrop-blur-sm rounded-2xl border border-stone-200/60 shadow-3xs flex items-center justify-around text-center divide-x divide-x-reverse divide-stone-200/80">
-            <div className="flex-1 px-1">
-              <span className="block text-xs sm:text-sm font-black text-amber-900 leading-none">50,000+</span>
-              <span className="block text-[8.5px] sm:text-[9.5px] text-stone-500 font-extrabold mt-1 font-sans">كلمة مولدة</span>
-            </div>
-            <div className="flex-1 px-2">
-              <span className="block text-xs sm:text-sm font-black text-amber-900 leading-none">2,000+</span>
-              <span className="block text-[8.5px] sm:text-[9.5px] text-stone-500 font-extrabold mt-1 font-sans">أديب ومستخدم</span>
-            </div>
-            <div className="flex-1 px-1">
-              <span className="block text-xs sm:text-sm font-black text-amber-900 leading-none">99.9%</span>
-              <span className="block text-[8.5px] sm:text-[9.5px] text-stone-500 font-extrabold mt-1 font-sans">وقت تشغيل</span>
-            </div>
-          </div>
-
-          {/* Featured Word of the Day */}
-          <div id="word-of-the-day-card" className="mt-8 max-w-md mx-auto rounded-3xl p-6 text-center space-y-3.5 transition duration-300 group royal-gradient-card border border-amber-500/30 shadow-[0_0_25px_rgba(245,158,11,0.25)] relative overflow-hidden">
+          {/* Featured Word of the Day directly underneath Search (as requested) */}
+          <div id="word-of-the-day-card" className="max-w-lg mx-auto mt-6 rounded-[24px] p-6 text-center space-y-4 transition duration-300 group royal-gradient-card border border-amber-500/25 shadow-[0_10px_30px_rgba(0,0,0,0.08)] relative overflow-hidden bg-neutral-900 text-white animate-fade-in-up">
             <div className="flex items-center justify-center gap-1.5 text-[10px] px-3 py-1 rounded-full w-max mx-auto leading-none uppercase bg-amber-500/20 text-amber-200 border border-amber-500/30 backdrop-blur-xs font-black">
-              <Sparkles className="w-3.5 h-3.5 animate-pulse text-amber-400" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span>كَلِمَةُ اليَوْم</span>
             </div>
             <div className="space-y-2">
-              <span className="block text-2xl md:text-3xl font-black font-serif-arabic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-105 to-amber-300 transition duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">« {currentDailyWordObj.word} »</span>
-              <p className="text-[12px] font-medium leading-relaxed px-2 font-serif-arabic text-stone-200 drop-shadow-md">
+              <span className="block text-2xl md:text-3xl font-black font-serif-arabic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-105 to-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">« {currentDailyWordObj.word} »</span>
+              <p className="text-xs sm:text-sm font-medium leading-relaxed px-4 font-body-arabic text-stone-200">
                 "{currentDailyWordObj.meaning}"
               </p>
             </div>
             {featuredRecord ? (
               <button
+                type="button"
                 onClick={() => setSelectedWord(featuredRecord)}
-                className="text-[11.5px] font-black text-amber-300 hover:text-amber-100 underline block mx-auto pt-1 h-5 cursor-pointer duration-200 hover:scale-103 drop-shadow-xs"
+                className="text-xs font-black text-amber-300 hover:text-amber-100 underline block mx-auto pt-1 cursor-pointer duration-200 hover:scale-102"
                 id="word-of-the-day-view-cert"
               >
-                حيزت بملك: {featuredRecord.owner} ✦ عاين صك الحيازة الفاخر 📜
+                حيزت بملك: {featuredRecord.owner} ✦ عاين شهادة الحيازة الفاخرة 📜
               </button>
             ) : (
               <button
+                type="button"
                 onClick={() => startClaimWord(currentDailyWordObj.word)}
-                className="text-[11.5px] font-black text-amber-300 hover:text-amber-100 underline block mx-auto pt-1 h-5 cursor-pointer duration-200 hover:scale-103 drop-shadow-xs"
+                className="text-xs font-black text-amber-300 hover:text-amber-100 underline block mx-auto pt-1 cursor-pointer duration-200 hover:scale-102"
                 id="word-of-the-day-claim"
               >
                 طالع وأثبت تملك « {currentDailyWordObj.word} » الآن ✦
@@ -454,43 +402,173 @@ export default function App() {
             )}
 
             {/* Subtle Countdown Timer */}
-            <div className="text-[10px] text-stone-300/65 font-medium font-sans flex items-center justify-center gap-1.5 mt-1 pt-2.5 border-t border-white/5 select-none text-center">
+            <div className="text-[11px] text-stone-300/80 font-medium font-body-arabic flex items-center justify-center gap-1.5 mt-2 pt-3 border-t border-white/5 select-none text-center">
               <span>تتغير الكلمة تلقائياً بعد:</span>
-              <span className="font-mono text-amber-300 font-extrabold tracking-wider">{timeLeft || "00:00:00"}</span>
+              <span className="font-mono text-amber-300 font-extrabold tracking-wider bg-black/30 px-2 py-0.5 rounded border border-white/10">{timeLeft || "00:00:00"}</span>
+            </div>
+          </div>
+        </div>
+
+      </header>
+
+      {/* Main Container / Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 space-y-24">
+        
+        {/* Error Header notifications */}
+        {errorHeader && (
+          <div className="p-4 bg-red-50 border-r-4 border-red-600 rounded-2xl text-xs text-red-900 font-medium flex items-center gap-3">
+            <ShieldAlert className="w-5 h-5 text-red-700 shrink-0" />
+            <div>
+              {errorHeader}{' '}
+              <button onClick={fetchWords} className="underline font-bold text-red-800 ml-2" id="retry-header-btn">
+                أعد المحاولة
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 1. إحصاءات المنصة الموثوقة (Lifted to the absolute top of the main container for immediate trust building) */}
+        <div className="py-6 px-4 bg-white border border-stone-200 rounded-[24px] shadow-[0_10px_30px_rgba(0,0,0,0.06)] flex flex-col sm:flex-row items-center justify-around text-center gap-4 divide-y sm:divide-y-0 sm:divide-x sm:divide-x-reverse divide-stone-200 relative z-10 -mt-6">
+          <div className="flex-1 px-4 py-2 sm:py-0">
+            <span className="block text-2xl sm:text-3xl font-extrabold text-[#B8891B] leading-none font-heading-arabic">50,000+</span>
+            <span className="block text-xs text-stone-500 font-extrabold mt-2 font-body-arabic">كلمة فريدة مولدة</span>
+          </div>
+          <div className="flex-1 px-4 py-2 sm:py-0 w-full sm:w-auto">
+            <span className="block text-2xl sm:text-3xl font-extrabold text-[#B8891B] leading-none font-heading-arabic">2,000+</span>
+            <span className="block text-xs text-stone-500 font-extrabold mt-2 font-body-arabic">أديب ومستخدم فعال</span>
+          </div>
+          <div className="flex-1 px-4 py-2 sm:py-0 w-full sm:w-auto">
+            <span className="block text-2xl sm:text-3xl font-extrabold text-[#B8891B] leading-none font-heading-arabic">99.9%</span>
+            <span className="block text-xs text-stone-500 font-extrabold mt-2 font-body-arabic">معدل وقت عمل المنصة</span>
+          </div>
+        </div>
+
+        {/* 2. مثال شهادة وتخصيص الأنماط (Immediate Visual Showcase of the product) */}
+        <section id="certificate-example-section" className="space-y-12">
+          
+          <RealExamples 
+            words={words}
+            onSelectExample={(exampleRecord) => setSelectedWord(exampleRecord)}
+          />
+
+        </section>
+
+        {/* 3. الكلمات الشائعة وقائمة الاختيار الأكثر طلباً بالديوان (Popular Words checklist) */}
+        <section id="popular-words-checklist" className="pt-8 border-t border-neutral-200/50 space-y-8">
+          
+          {/* Popular Words checklist dashboard */}
+          <div className="bg-stone-50 border border-neutral-200 rounded-[24px] p-6 md:p-8 space-y-6 text-right shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-100 font-bold font-heading-arabic">
+                <Flame className="w-3.5 h-3.5 text-amber-600" />
+                <span>الطلب غير المسبوق</span>
+              </div>
+              <h3 className="text-lg md:text-xl font-bold text-neutral-800 font-heading-arabic">الألفاظ الأكثر طلباً وبحثاً بالديوان</h3>
+              <p className="text-xs text-neutral-500 font-body-arabic">مجموعة من الكلمات الأكثر تكراراً ورغبةً في التراكم الوجداني واللغوي. يتاح لك تصميم شهادتها وحفظها لك.</p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+              {POPULAR_WORDS_LIST.map((p) => {
+                const classification = classifyArabicWord(p.word);
+                return (
+                  <div
+                    key={p.word}
+                    onClick={() => startClaimWord(p.word)}
+                    className={`p-4 border rounded-2xl cursor-pointer hover:shadow-xs transition hover:scale-103 text-center flex flex-col justify-between ${p.color}`}
+                    id={`popular-item-${p.word}`}
+                  >
+                    <div>
+                      <span className="block text-lg font-bold mb-1 font-heading-arabic">{p.word}</span>
+                      <span className="text-[9px] opacity-80 font-bold block line-clamp-1 font-body-arabic" title={classification.category}>
+                        {classification.category.replace("المجموعة", "طراز")}
+                      </span>
+                    </div>
+                    <div className="mt-2.5 pt-2 border-t border-current/10 flex items-center justify-between text-[11px] font-mono font-black">
+                      <span className="text-[10px] opacity-75">القيمة:</span>
+                      <span>${classification.finalPrice}</span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-        </div>
+        </section>
 
-        {/* Ready-Made Templates section requested by user */}
-        <section id="ready-made-templates" className="max-w-4xl mx-auto pt-6 pb-2 px-4 text-right space-y-4">
+        {/* 4. حائط المبادلات والملكيات (Adoption & registry search proof - Beautiful, clean & simplified wall) */}
+        <section id="words-wall-section" className="pt-16 border-t border-neutral-200/50 space-y-6">
+          <div id="words-wall" className="space-y-6">
+            <div className="flex items-center justify-between border-b border-neutral-200/60 pb-3 [direction:rtl]">
+              <div className="flex items-center gap-2">
+                <Compass className="w-5 h-5 text-[#B8891B]" />
+                <h2 className="text-base sm:text-lg font-extrabold text-neutral-800 font-heading-arabic">حائط المِلْكِيّات للكلمات 🌌 (Word Owners Wall)</h2>
+              </div>
+              <div className="flex items-center gap-2">
+                {loading && <span className="text-[10px] text-neutral-400 font-medium font-mono">تحديث الفهرس...</span>}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBookingPrefilledWord('');
+                    setShowBookingModal(true);
+                  }}
+                  className="bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-xs cursor-pointer font-heading-arabic"
+                  id="nav-create-word-btn"
+                >
+                  <span>احجز كلمتك الحالية</span>
+                  <span className="text-[9px] opacity-70">✦</span>
+                </button>
+              </div>
+            </div>
+
+            {loading ? (
+              <div className="py-24 text-center space-y-3">
+                <div className="w-10 h-10 border-2 border-[#B8891B] border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="text-xs text-neutral-500 font-semibold font-body-arabic">جاري تحميل الفهرس اللغوي للألفاظ المحجوزة...</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <LinguisticNetwork
+                  words={words}
+                  onSelectWord={(wordRecord) => setSelectedWord(wordRecord)}
+                  onAddWord={() => {
+                    setBookingPrefilledWord('');
+                    setShowBookingModal(true);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* 5. النماذج الجاهزة للتوليد البليغ (Engagement Playground feature) */}
+        <section id="ready-made-templates" className="pt-16 border-t border-neutral-200/50 space-y-6">
           <div className="flex items-center gap-1.5 justify-start">
-            <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-amber-900 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-full uppercase leading-none">
-              <Sparkles className="w-3 h-3 text-amber-600 animate-pulse animate-spin" style={{ animationDuration: '4s' }} />
-              <span>قِسْمُ النَّمَاذِجِ الجَاهِزَةِ للتَّوْلِيدِ البَلِيغِ</span>
+            <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-amber-950 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-full uppercase leading-none">
+              <Sparkles className="w-3" />
+              <span>قِسْمُ النَّمَاجِذ الجَاهِزَة للتَّوْلِيد البَلِيغ</span>
             </span>
           </div>
-          <div className="space-y-1">
-            <h3 className="text-base sm:text-lg font-extrabold text-neutral-800 font-sans leading-none">
+          <div className="space-y-1 text-right">
+            <h3 className="text-base sm:text-lg font-extrabold text-neutral-800 font-heading-arabic leading-none">
               ثق بجمال الحروف في صياغة خطاباتك المتنوعة
             </h3>
-            <p className="text-[11px] text-stone-500 font-medium">
-              انقر على أي من النماذج الراقية أدناه ليقوم مساعدك الذكي مستشار الكلمات بتطويع البلاغة بلمح البصر:
+            <p className="text-[11px] sm:text-xs text-stone-550 font-medium font-body-arabic">
+              انقر على أحد النماذج الراقية ليقوم مساعدك المستشار الذكي بتطويع البلاغة فوراً:
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               {
                 title: "كتابة مقال أدبي",
                 desc: "مقال رصين يجسد روح اللغة وبلاغة الفصحى العريقة.",
                 icon: FileText,
-                iconColor: "text-amber-600 bg-amber-50",
+                iconColor: "text-[#B8891B] bg-amber-50",
                 prompt: "أريد كتابة مقال أدبي فصيح وبليغ للغاية مسترشداً بمقام الكلمات الكبرى بالديوان الوجداني، واشمل فيه بعض الفرائد اللغوية الرصينة."
               },
               {
                 title: "منشور لمنصة (X)",
-                desc: "عبارات بليغة رنانة تلامس أسماع ومحبي ومتابعي صفحتك.",
+                desc: "عبارات بليغة رنانة تلامس أسماع ومحبي ومتابعيصفحتك.",
                 icon: Sparkles,
                 iconColor: "text-emerald-700 bg-emerald-50",
                 prompt: "صغ لي ثلاثة منشورات بليغة وجذابة للغاية لمنصة X (تويتر سابقاً) تعبر عن المشاعر الوجدانية العميقة كالشغف والسلام واليقين بنثر ساحر."
@@ -515,22 +593,22 @@ export default function App() {
                 <button
                   key={index}
                   onClick={() => setChatTriggerPrompt(item.prompt)}
-                  className="bg-white border border-stone-200/80 p-3.5 rounded-2xl flex flex-col items-start text-right space-y-2.5 hover:border-neutral-900 hover:shadow-xs duration-300 transition-all cursor-pointer group active:scale-97"
+                  className="bg-white border border-stone-200/80 p-5 rounded-[24px] flex flex-col items-start text-right space-y-3.5 hover:border-[#B8891B] hover:shadow-[0_10px_30px_rgba(0,0,0,0.04)] duration-300 transition-all cursor-pointer group active:scale-97 shadow-[0_10px_30px_rgba(0,0,0,0.01)]"
                   id={`template-btn-${index}`}
                 >
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border border-stone-150/40 ${item.iconColor} group-hover:scale-105 duration-200`}>
-                    <IconComp className="w-3.5 h-3.5" />
+                  <div className={`w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 border border-stone-150/40 ${item.iconColor} group-hover:scale-105 duration-200`}>
+                    <IconComp className="w-4 h-4" />
                   </div>
-                  <div className="space-y-1 flex-1 w-full">
-                    <span className="block text-[11px] font-black text-stone-900 transition duration-200 group-hover:text-amber-800 font-sans">
+                  <div className="space-y-1.5 flex-1 w-full">
+                    <span className="block text-xs font-black text-stone-900 transition duration-200 group-hover:text-[#B8891B] font-heading-arabic">
                       {item.title}
                     </span>
-                    <p className="text-[10px] text-stone-500 leading-normal font-sans">
+                    <p className="text-[11.5px] text-stone-500 leading-relaxed font-body-arabic">
                       {item.desc}
                     </p>
                   </div>
-                  <div className="w-full text-left pt-1 px-1 border-t border-stone-100 mt-1">
-                    <span className="text-[9px] font-black text-[#8c6b12] hover:underline inline-flex items-center gap-0.5 font-sans">
+                  <div className="w-full text-left pt-2 px-1 border-t border-stone-100 mt-1">
+                    <span className="text-[10px] font-black text-[#B8891B] hover:underline inline-flex items-center gap-0.5 font-heading-arabic">
                       جرّب التوليد الآن ✦
                     </span>
                   </div>
@@ -540,127 +618,34 @@ export default function App() {
           </div>
         </section>
 
-      </header>
-
-      {/* Main Container / Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 space-y-12">
-        
-        {/* Error Header notifications */}
-        {errorHeader && (
-          <div className="p-4 bg-red-50 border-r-4 border-red-600 rounded-2xl text-xs text-red-900 font-medium flex items-center gap-3">
-            <ShieldAlert className="w-5 h-5 text-red-700 shrink-0" />
-            <div>
-              {errorHeader}{' '}
-              <button onClick={fetchWords} className="underline font-bold text-red-800 ml-2" id="retry-header-btn">
-                أعد المحاولة
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* NEW Real word ownership examples showcase section */}
-        <RealExamples 
-          words={words}
-          onSelectExample={(exampleRecord) => setSelectedWord(exampleRecord)}
-        />
-
-        {/* NEW Popular / Most Traded Words Dashboard Section */}
-        <div className="bg-stone-50 border border-neutral-200/60 rounded-3xl p-6 md:p-8 space-y-5 text-right">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100 font-bold">
-              <Flame className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
-              <span>الطلب غير المسبوق</span>
-            </div>
-            <h3 className="text-lg md:text-xl font-bold text-neutral-800">الحروف الوجدانية الأكثر تداولاً وبحثاً في الديوان</h3>
-            <p className="text-xs text-neutral-500">مجموعة من الكلمات الأكثر رغبة وجاذبية في التراكم البلاغي العربي. بادر بحجزها قبل الآخرين.</p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
-            {POPULAR_WORDS_LIST.map((p) => {
-              const classification = classifyArabicWord(p.word);
-              return (
-                <div
-                  key={p.word}
-                  onClick={() => startClaimWord(p.word)}
-                  className={`p-4 border rounded-2xl cursor-pointer hover:shadow-sm transition hover:scale-103 text-center flex flex-col justify-between ${p.color}`}
-                  id={`popular-item-${p.word}`}
-                >
-                  <div>
-                    <span className="block text-xl font-bold mb-1">{p.word}</span>
-                    <span className="text-[8.5px] opacity-80 font-bold block line-clamp-1" title={classification.category}>
-                      {classification.category.replace("المجموعة", "طراز")}
-                    </span>
-                  </div>
-                  <div className="mt-3 pt-2 border-t border-current/10 flex items-center justify-between text-xs font-mono font-black">
-                    <span className="text-[9px] opacity-70">القيمة:</span>
-                    <span>${classification.finalPrice}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Section divider and Wall */}
-        <section id="words-wall" className="space-y-4">
-          <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
-            <div className="flex items-center gap-2">
-              <Compass className="w-5 h-5 text-amber-600" />
-              <h2 className="text-base font-extrabold text-neutral-800">حائط ملاك الكلمات (Word Owners Wall)</h2>
-            </div>
-            <div className="flex items-center gap-2">
-              {loading && <span className="text-[10px] text-neutral-400 font-medium font-mono">تنشيط السجل...</span>}
-              <button
-                onClick={() => {
-                  setBookingPrefilledWord('');
-                  setShowBookingModal(true);
-                }}
-                className="bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-xs"
-                id="nav-create-word-btn"
-              >
-                <span>احجز كلمتك الحالية</span>
-                <span className="text-[9px] opacity-70">✦</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Words grid list wrapper */}
-          {loading ? (
-            <div className="py-24 text-center space-y-3">
-              <div className="w-10 h-10 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-              <p className="text-xs text-neutral-500 font-semibold">جاري تحميل لوحة الكلمات الموثقة في السجلات السحابية...</p>
-            </div>
-          ) : (
-            <div className="space-y-8">
-              <LinguisticNetwork
-                words={words}
-                onSelectWord={(wordRecord) => setSelectedWord(wordRecord)}
-              />
-            </div>
-          )}
-
+        {/* 6. آراء المستخدمين والزوار في مجتمعنا (Social Validation) */}
+        <section id="reviews-section" className="pt-16 border-t border-neutral-200/50">
+          <TrustSection />
         </section>
 
-        {/* عن آلية الحيازة والتملك */}
-        <section id="ownership-details-section" className="space-y-6">
-          <div className="border-b border-neutral-200 pb-3 text-right">
-            <div className="inline-flex items-center gap-1.5 text-xs text-amber-800 bg-amber-50 border border-amber-200/60 px-2.5 py-1 rounded-full font-bold">
-              <Award className="w-3.5 h-3.5 text-amber-600" />
+        {/* 7. دليل الميثاق وفلسفة منصة ديوان كلمتي (Brand Deep Connection Story) */}
+        <section id="ownership-details-section" className="pt-16 border-t border-neutral-200/50 space-y-6">
+          <div className="text-right">
+            <div className="inline-flex items-center gap-1.5 text-xs text-amber-800 bg-amber-50 border border-amber-200/60 px-2.5 py-1 rounded-full font-bold font-heading-arabic">
+              <Award className="w-3.5 h-3.5 text-[#B8891B]" />
               <span>دليل الميثاق والتملك الأدبي</span>
             </div>
-            <h2 className="text-[17px] md:text-xl font-black text-neutral-800 mt-1">
+            <h2 className="text-lg md:text-xl font-black text-neutral-800 mt-2 font-heading-arabic">
               عن آلية الحيازة والتملك وفلسفة المنصة
             </h2>
           </div>
-          
           <BrandManifesto />
         </section>
 
-        {/* Collapsible FAQ Section (الأسئلة الشائعة) */}
-        <CollapsibleFAQ />
+        {/* 8. الأسئلة الشائعة وتدابير السداد (Objection clearing before finalizing action) */}
+        <section id="faq-section" className="pt-16 border-t border-neutral-200/50">
+          <CollapsibleFAQ />
+        </section>
 
-        {/* NEW How It Works Section (كيف يعمل ديوان كلمتي؟ في نهاية الصفحة) */}
-        <HowItWorks />
+        {/* 9. كيف يعمل ديوان كلمتي؟ (Explaining steps right after clarifying FAQs - as requested) */}
+        <section id="how-it-works-section" className="pt-16 border-t border-neutral-200/50 space-y-6">
+          <HowItWorks />
+        </section>
 
       </main>
 

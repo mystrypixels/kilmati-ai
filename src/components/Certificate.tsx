@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { WordRecord } from '../types';
-import { Award, Share2, Printer, X, Gift, ShieldCheck } from 'lucide-react';
+import { Award, Share2, Printer, X, Gift, ShieldCheck, Instagram, Download, Copy, Sparkles } from 'lucide-react';
+import { toPng } from 'html-to-image';
 
 interface CertificateProps {
   record: WordRecord;
@@ -11,6 +12,50 @@ interface CertificateProps {
 export default function Certificate({ record, onClose, standalone = false }: CertificateProps) {
   const certRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
+  const [instagramModalOpen, setInstagramModalOpen] = useState(false);
+  const [generatedImageSrc, setGeneratedImageSrc] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [igCopiedText, setIgCopiedText] = useState(false);
+
+  const generateCertificateImage = async () => {
+    if (!certRef.current) return;
+    setIsGenerating(true);
+    setInstagramModalOpen(true);
+    setGeneratedImageSrc(null);
+    try {
+      // Small timeout to guarantee DOM rendering stabilizes
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      const dataUrl = await toPng(certRef.current, {
+        quality: 1.0,
+        backgroundColor: '#faf6eb',
+        style: {
+          transform: 'scale(1)',
+          borderRadius: '24px',
+          boxShadow: 'none'
+        }
+      });
+      setGeneratedImageSrc(dataUrl);
+    } catch (error) {
+      console.error('Error generating image for Instagram sharing:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleCopyIGCaption = () => {
+    const caption = `أمتلكُ اليوم رمزياً كلمة « ${record.word} » باللغة العربية عبر منصة كِلْمَتِي! ✨📜\n\nالجوهر والمعنى: "${record.meaning}"\nالبيان الشعري: "${record.quote}"\n\n#كلمتي #اللغة_العربية #أدب #فصاحة #لغتي_الجميلة`;
+    navigator.clipboard.writeText(caption);
+    setIgCopiedText(true);
+    setTimeout(() => setIgCopiedText(false), 2000);
+  };
+
+  const handleDownloadImage = () => {
+    if (!generatedImageSrc) return;
+    const link = document.createElement('a');
+    link.download = `شهادة_ملكية-${record.word}.png`;
+    link.href = generatedImageSrc;
+    link.click();
+  };
 
   const handlePrint = () => {
     const printContent = certRef.current?.innerHTML;
@@ -141,6 +186,16 @@ export default function Certificate({ record, onClose, standalone = false }: Cer
               مشاركة الكلمة
             </button>
           )}
+          
+          <button
+            onClick={generateCertificateImage}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-705 hover:to-orange-505 text-white rounded-xl text-xs font-black transition-all duration-200 active:scale-95 cursor-pointer shadow-3xs"
+            title="مشاركة صورة الشهادة الفاخرة على إنستجرام"
+            id={`instagram-btn-${record.id}`}
+          >
+            <Instagram className="w-3.5 h-3.5 animate-pulse" />
+            <span>مشاركة على إنستقرام 📸</span>
+          </button>
           
           <button
             onClick={handlePrint}
@@ -358,7 +413,7 @@ export default function Certificate({ record, onClose, standalone = false }: Cer
                   {/* Balanced box container for Certificate Number ID directly */}
                   <div className={`${styles.certIdBg} border ${styles.certIdBorder} rounded-xl px-4 py-1.5 text-center w-full max-w-[210px] shadow-3xs`}>
                     <span className={`block text-[8px] font-bold uppercase tracking-wider mb-0.5 ${styles.labelColor}`}>
-                      رقم الصك السحابي
+                      رقم الشهادة الرقمية
                     </span>
                     <span className={`block font-mono text-[9px] font-bold tracking-wider ${styles.certIdText}`}>
                       OWN-{record.id.toUpperCase().substring(0, 10)}
@@ -418,6 +473,116 @@ export default function Certificate({ record, onClose, standalone = false }: Cer
           </div>
         )}
       </div>
+
+      {/* Instagram Stories / Post Sharing Modal Guidance */}
+      {instagramModalOpen && (
+        <div className="fixed inset-0 bg-neutral-950/85 backdrop-blur-md z-[100] flex items-center justify-center p-4 [direction:rtl]">
+          <div className="bg-white border border-stone-200 shadow-2xl rounded-[32px] w-full max-w-lg overflow-hidden p-6 md:p-8 space-y-6 relative transition-all duration-300">
+            
+            {/* Close button */}
+            <button
+              onClick={() => setInstagramModalOpen(false)}
+              className="absolute left-4 top-4 w-9 h-9 flex items-center justify-center rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Title block */}
+            <div className="text-center space-y-2 pt-2">
+              <div className="w-12 h-12 bg-gradient-to-tr from-purple-600 via-pink-600 to-orange-500 rounded-2xl flex items-center justify-center text-white mx-auto shadow-md">
+                <Instagram className="w-6 h-6 animate-pulse" />
+              </div>
+              <h3 className="text-lg font-extrabold text-stone-900 font-heading-arabic">مشاركة الشهادة الفاخرة على إنستقرام 📸</h3>
+              <p className="text-xs text-stone-500 font-body-arabic">اتبع الخطوات البسيطة التالية لنشر رونق الكلمة على حسابك الشخصي</p>
+            </div>
+
+            {/* Step 1: Image Capture & Download Preview */}
+            <div className="bg-stone-50 p-4 border border-stone-150 rounded-2xl space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-extrabold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50">الخطوة 1: حفظ صورة التملّك</span>
+                <span className="text-[10px] text-stone-400 font-mono">JPG / PNG</span>
+              </div>
+              
+              <div className="flex items-center justify-center min-h-[160px] bg-white border border-stone-200 rounded-xl overflow-hidden relative shadow-3xs p-1">
+                {isGenerating || !generatedImageSrc ? (
+                  <div className="flex flex-col items-center justify-center text-center p-4 space-y-3 text-stone-700">
+                    <div className="w-8 h-8 rounded-full border-3 border-amber-600/20 border-t-amber-600 animate-spin" />
+                    <span className="text-xs font-bold font-heading-arabic">جاري حياكة وصياغة صورة الشهادة الفاخرة...</span>
+                    <span className="text-[10px] text-stone-400">بجودة فائقة الدقة للتواصل</span>
+                  </div>
+                ) : (
+                  <div className="relative group w-full flex flex-col items-center">
+                    <img
+                      src={generatedImageSrc}
+                      alt="شهادة ملكية الكلمة لإنستقرام"
+                      className="max-h-[160px] w-auto object-contain rounded-lg border border-stone-100 shadow-3xs"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 duration-200 flex items-center justify-center rounded-lg">
+                      <span className="text-xs text-white font-semibold">جاهزة للنشر ✨</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {generatedImageSrc && (
+                <button
+                  onClick={handleDownloadImage}
+                  className="w-full py-2.5 bg-neutral-900 hover:bg-neutral-800 text-stone-50 rounded-xl text-xs font-black transition duration-200 shadow-3xs cursor-pointer flex items-center justify-center gap-2 font-heading-arabic"
+                >
+                  <Download className="w-4 h-4 animate-bounce" />
+                  <span>تحميل الصورة إلى جهازك 📥</span>
+                </button>
+              )}
+            </div>
+
+            {/* Step 2: Copy Caption for Caption / Stories link card */}
+            <div className="bg-stone-50 p-4 border border-stone-150 rounded-2xl space-y-2 text-right">
+              <span className="text-[11px] font-extrabold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 block w-max">الخطوة 2: نسخ الوصف الأدبي</span>
+              <p className="text-[11px] text-stone-500 font-body-arabic leading-relaxed pt-1">الوصف البليغ والهاشتاجات المجهزة لمنشورك أو قصتك:</p>
+              
+              <div className="bg-white p-3 border border-stone-200 rounded-xl relative select-all">
+                <p className="text-[11px] font-bold text-stone-800 font-sans leading-relaxed whitespace-pre-wrap select-all">
+                  {`أمتلكُ اليوم رمزياً كلمة « ${record.word} » باللغة العربية عبر منصة كِلْمَتِي! ✨📜\n\nالجوهر والمعنى: "${record.meaning}"\nالبيان الشعري: "${record.quote}"\n\n#كلمتي #اللغة_العربية #أدب`}
+                </p>
+              </div>
+
+              <button
+                onClick={handleCopyIGCaption}
+                className={`w-full py-2 rounded-xl text-xs font-bold transition duration-200 shadow-3xs cursor-pointer flex items-center justify-center gap-1.5 font-heading-arabic ${
+                  igCopiedText
+                    ? 'bg-emerald-100 border border-emerald-200 text-emerald-700'
+                    : 'bg-white hover:bg-stone-100 border border-stone-250 text-stone-800'
+                }`}
+              >
+                {igCopiedText ? (
+                  <>
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 animate-pulse" />
+                    <span>تم نسخ النص المجهّز! ✦</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>نسخ الوصف والهاشتاج 📋</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Step 3: Publish */}
+            <div className="bg-amber-50/50 border border-amber-200/50 p-3.5 rounded-2xl flex gap-2.5 items-start">
+              <span className="text-base select-none">💡</span>
+              <div className="space-y-0.5">
+                <span className="block text-xs font-extrabold text-amber-900 font-heading-arabic">الخطوة 3: النشر والمشاركة</span>
+                <p className="text-[11px] text-amber-850 font-body-arabic leading-relaxed">
+                  افتح تطبيق **إِنْسْتِقْرَام**، وشارك الصورة كمنشور أو قصة (Story)، وألصق النص، وشارك تملّكك الفاخر مع أصدقائك بوضع رابط الموقع! 🌟
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );

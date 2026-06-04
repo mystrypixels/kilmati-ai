@@ -242,17 +242,17 @@ export default function RealExamples({ onSelectExample, words = [] }: RealExampl
   const styles = themesMap[selectedTheme] || themesMap.gold;
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 border border-neutral-150/80 shadow-md space-y-6">
+    <div className="bg-white rounded-3xl p-6 md:p-8 border border-neutral-150/80 shadow-[0_10px_30px_rgba(0,0,0,0.06)] space-y-6">
       
       {/* Dynamic Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 text-right pb-4 border-b border-neutral-100">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-100 rounded-full text-xs font-bold text-amber-850">
-            <Sparkles className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
-            <span>ديوان صكوك السيادة والملكيات الفخرية</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+            <span>ديوان الشهادات والملكيات الفخرية الرقمية</span>
           </div>
           <h3 className="text-xl md:text-2xl font-black font-sans text-neutral-800 leading-snug">
-            عرض حي تفاعلي لألوان وتصاميم صكوك السيادة
+            عرض حي تفاعلي لألوان وتصاميم الشهادات الرقمية
           </h3>
           <p className="text-xs text-neutral-500 max-w-2xl font-sans">
             تتغير الألوان والجماليات الخطية للشهادات تلقائياً بناءً على الطراز المختار. انقر على أي لون أو طراز أدناه لتشاهد رونقه الفريد.
@@ -266,7 +266,7 @@ export default function RealExamples({ onSelectExample, words = [] }: RealExampl
           id="reveal-full-deed-btn"
         >
           <Eye className="w-4 h-4" />
-          <span>استعراض طراز الصك بالكامل للطباعة والتحميل</span>
+          <span>استعراض طراز الشهادة بالكامل للطباعة والتحميل</span>
         </button>
       </div>
 
@@ -276,7 +276,7 @@ export default function RealExamples({ onSelectExample, words = [] }: RealExampl
         {/* RIGHT SIDEBAR: Certificate Styles / Colors Directory (col-span-4) */}
         <div className="lg:col-span-4 flex flex-col gap-3 max-h-[380px] lg:max-h-[460px] overflow-y-auto pr-1 text-right scrollbar-thin scrollbar-thumb-neutral-200" id="deeds-directory-list">
           <div className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider mb-1 flex items-center justify-between">
-            <span>أنواع وألوان الصكوك المتاحة</span>
+            <span>أنواع وألوان الشهادات المتاحة</span>
             <span className="text-[9px] bg-amber-50 text-[#8c6b12] px-2 py-0.5 rounded-full font-mono font-bold">
               {deeds.length} خيارات فنية
             </span>
