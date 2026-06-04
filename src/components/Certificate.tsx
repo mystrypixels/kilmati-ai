@@ -11,6 +11,7 @@ interface CertificateProps {
 
 export default function Certificate({ record, onClose, standalone = false }: CertificateProps) {
   const certRef = useRef<HTMLDivElement>(null);
+  const igPostRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
   const [instagramModalOpen, setInstagramModalOpen] = useState(false);
   const [generatedImageSrc, setGeneratedImageSrc] = useState<string | null>(null);
@@ -18,19 +19,23 @@ export default function Certificate({ record, onClose, standalone = false }: Cer
   const [igCopiedText, setIgCopiedText] = useState(false);
 
   const generateCertificateImage = async () => {
-    if (!certRef.current) return;
     setIsGenerating(true);
     setInstagramModalOpen(true);
     setGeneratedImageSrc(null);
     try {
       // Small timeout to guarantee DOM rendering stabilizes
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      const dataUrl = await toPng(certRef.current, {
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      if (!igPostRef.current) {
+        throw new Error("Instagram target post container ref is not ready.");
+      }
+      const dataUrl = await toPng(igPostRef.current, {
         quality: 1.0,
         backgroundColor: '#faf6eb',
+        width: 1080,
+        height: 1080,
         style: {
           transform: 'scale(1)',
-          borderRadius: '24px',
+          borderRadius: '0px',
           boxShadow: 'none'
         }
       });
@@ -43,7 +48,7 @@ export default function Certificate({ record, onClose, standalone = false }: Cer
   };
 
   const handleCopyIGCaption = () => {
-    const caption = `أمتلكُ اليوم رمزياً كلمة « ${record.word} » باللغة العربية عبر منصة كِلْمَتِي! ✨📜\n\nالجوهر والمعنى: "${record.meaning}"\nالبيان الشعري: "${record.quote}"\n\n#كلمتي #اللغة_العربية #أدب #فصاحة #لغتي_الجميلة`;
+    const caption = `أمتلكُ اليوم رمزياً كلمة « ${record.word} » باللغة العربية عبر منصة كِلْمَتِي! ✨📜\n\nالجوهر والمعنى: "${record.meaning}"\nالبيان الشعري: "${record.quote}"\n\nشاهد شهادة توثيقي الحصري عبر الرابط التالي:\n${window.location.origin}?word=${encodeURIComponent(record.word)}\n\n#كلمتي #اللغة_العربية #أدب #فصاحة #لغتي_الجميلة`;
     navigator.clipboard.writeText(caption);
     setIgCopiedText(true);
     setTimeout(() => setIgCopiedText(false), 2000);
@@ -146,6 +151,111 @@ export default function Certificate({ record, onClose, standalone = false }: Cer
     }
   };
 
+  const activeTheme = record.theme || 'gold';
+  const themesMap = {
+    gold: {
+      containerBg: "bg-[#faf6eb]",
+      borderClass: "border-[#d8bc74]/60",
+      innerBorderClass: "border-[#d4af37]/30",
+      labelColor: "text-[#8c6b12]",
+      titleColor: "text-[#111111]",
+      ownerLabelBg: "bg-white/90",
+      ownerLabelBorder: "border-[#e9dbb5]/60",
+      ownerNameText: "text-neutral-900",
+      wordColor: "text-[#8c6b12]",
+      wordSubText: "text-[#8c6b12]",
+      certIdBg: "bg-white/80",
+      certIdBorder: "border-[#eddcb3]/50",
+      certIdText: "text-neutral-800",
+      sealBg: "bg-[#fdfbf7]",
+      sealBorder: "border-[#d4af37]",
+      sealText: "text-[#8c6b12]",
+      signatureColor: "text-[#8c6b12]",
+      accentBarGradient: "from-amber-400 via-yellow-500 to-amber-600"
+    },
+    emerald: {
+      containerBg: "bg-[#f2faf7]",
+      borderClass: "border-[#a3dfca]/60",
+      innerBorderClass: "border-[#059669]/25",
+      labelColor: "text-[#065f46]",
+      titleColor: "text-[#0f172a]",
+      ownerLabelBg: "bg-white/85",
+      ownerLabelBorder: "border-[#c4edd9]/50",
+      ownerNameText: "text-emerald-950",
+      wordColor: "text-[#047857]",
+      wordSubText: "text-[#065f46]",
+      certIdBg: "bg-white/70",
+      certIdBorder: "border-[#cbf3e1]/50",
+      certIdText: "text-emerald-950",
+      sealBg: "bg-[#f4fbf9]",
+      sealBorder: "border-[#059669]",
+      sealText: "text-[#065f46]",
+      signatureColor: "text-[#059669]",
+      accentBarGradient: "from-emerald-400 via-teal-500 to-emerald-600"
+    },
+    onyx: {
+      containerBg: "bg-[#fcfbf9]",
+      borderClass: "border-neutral-300",
+      innerBorderClass: "border-neutral-400/20",
+      labelColor: "text-neutral-500",
+      titleColor: "text-neutral-900",
+      ownerLabelBg: "bg-neutral-150/90",
+      ownerLabelBorder: "border-neutral-300",
+      ownerNameText: "text-neutral-900",
+      wordColor: "text-neutral-900",
+      wordSubText: "text-neutral-900",
+      certIdBg: "bg-neutral-100/90",
+      certIdBorder: "border-neutral-250",
+      certIdText: "text-neutral-600",
+      sealBg: "bg-neutral-100",
+      sealBorder: "border-neutral-400",
+      sealText: "text-neutral-700",
+      signatureColor: "text-neutral-800",
+      accentBarGradient: "from-neutral-400 via-neutral-500 to-neutral-700"
+    },
+    sapphire: {
+      containerBg: "bg-[#f4f7fc]",
+      borderClass: "border-[#adc5ec]/60",
+      innerBorderClass: "border-[#1d4ed8]/25",
+      labelColor: "text-[#005792]",
+      titleColor: "text-[#0f172a]",
+      ownerLabelBg: "bg-white/85",
+      ownerLabelBorder: "border-[#d0def3]/50",
+      ownerNameText: "text-blue-950",
+      wordColor: "text-[#005792]",
+      wordSubText: "text-[#005792]",
+      certIdBg: "bg-white/70",
+      certIdBorder: "border-[#d8e3f4]/50",
+      certIdText: "text-blue-950",
+      sealBg: "bg-[#fafdff]",
+      sealBorder: "border-[#005792]",
+      sealText: "text-[#005792]",
+      signatureColor: "text-[#005792]",
+      accentBarGradient: "from-blue-400 via-indigo-505 to-blue-600"
+    },
+    ruby: {
+      containerBg: "bg-[#fdf5f5]",
+      borderClass: "border-[#efa9a9]/60",
+      innerBorderClass: "border-[#b91c1c]/25",
+      labelColor: "text-[#991b1b]",
+      titleColor: "text-[#1d1010]",
+      ownerLabelBg: "bg-white/85",
+      ownerLabelBorder: "border-[#f6cfcf]/50",
+      ownerNameText: "text-rose-950",
+      wordColor: "text-[#b91c1c]",
+      wordSubText: "text-[#991b1b]",
+      certIdBg: "bg-white/70",
+      certIdBorder: "border-[#fbdcdb]/50",
+      certIdText: "text-rose-950",
+      sealBg: "bg-[#fffafa]",
+      sealBorder: "border-[#b91c1c]",
+      sealText: "text-[#991b1b]",
+      signatureColor: "text-[#b91c1c]",
+      accentBarGradient: "from-red-400 via-rose-505 to-red-600"
+    }
+  };
+  const styles = themesMap[activeTheme as keyof typeof themesMap] || themesMap.gold;
+
   return (
     <div className={`flex flex-col items-center max-w-4xl mx-auto w-full ${standalone ? '' : 'p-2'}`}>
       
@@ -165,7 +275,7 @@ export default function Certificate({ record, onClose, standalone = false }: Cer
           )}
         </div>
 
-        <div className="flex items-center gap-2 font-sans">
+        <div className="flex items-center gap-2 font-sans flex-wrap sm:flex-nowrap">
           {copied ? (
             <button
               type="button"
@@ -224,114 +334,7 @@ export default function Certificate({ record, onClose, standalone = false }: Cer
         ref={certRef}
         className="w-full relative transition-all duration-300"
       >
-        {(() => {
-          const activeTheme = record.theme || 'gold';
-          const themesMap = {
-            gold: {
-              containerBg: "bg-[#faf6eb]",
-              borderClass: "border-[#d8bc74]/60",
-              innerBorderClass: "border-[#d4af37]/30",
-              labelColor: "text-[#8c6b12]",
-              titleColor: "text-[#111111]",
-              ownerLabelBg: "bg-white/90",
-              ownerLabelBorder: "border-[#e9dbb5]/60",
-              ownerNameText: "text-neutral-900",
-              wordColor: "text-[#8c6b12]",
-              wordSubText: "text-[#8c6b12]",
-              certIdBg: "bg-white/80",
-              certIdBorder: "border-[#eddcb3]/50",
-              certIdText: "text-neutral-800",
-              sealBg: "bg-[#fdfbf7]",
-              sealBorder: "border-[#d4af37]",
-              sealText: "text-[#8c6b12]",
-              signatureColor: "text-[#8c6b12]",
-              accentBarGradient: "from-amber-400 via-yellow-500 to-amber-600"
-            },
-            emerald: {
-              containerBg: "bg-[#f2faf7]",
-              borderClass: "border-[#a3dfca]/60",
-              innerBorderClass: "border-[#059669]/25",
-              labelColor: "text-[#065f46]",
-              titleColor: "text-[#0f172a]",
-              ownerLabelBg: "bg-white/85",
-              ownerLabelBorder: "border-[#c4edd9]/50",
-              ownerNameText: "text-emerald-950",
-              wordColor: "text-[#047857]",
-              wordSubText: "text-[#065f46]",
-              certIdBg: "bg-white/70",
-              certIdBorder: "border-[#cbf3e1]/50",
-              certIdText: "text-emerald-950",
-              sealBg: "bg-[#f4fbf9]",
-              sealBorder: "border-[#059669]",
-              sealText: "text-[#065f46]",
-              signatureColor: "text-[#059669]",
-              accentBarGradient: "from-emerald-400 via-teal-500 to-emerald-600"
-            },
-            onyx: {
-              containerBg: "bg-[#fcfbf9]",
-              borderClass: "border-neutral-300",
-              innerBorderClass: "border-neutral-400/20",
-              labelColor: "text-neutral-500",
-              titleColor: "text-neutral-900",
-              ownerLabelBg: "bg-neutral-100/90",
-              ownerLabelBorder: "border-neutral-300",
-              ownerNameText: "text-neutral-900",
-              wordColor: "text-neutral-900",
-              wordSubText: "text-neutral-900",
-              certIdBg: "bg-neutral-100/90",
-              certIdBorder: "border-neutral-250",
-              certIdText: "text-neutral-600",
-              sealBg: "bg-neutral-100",
-              sealBorder: "border-neutral-400",
-              sealText: "text-neutral-700",
-              signatureColor: "text-neutral-800",
-              accentBarGradient: "from-neutral-400 via-neutral-500 to-neutral-700"
-            },
-            sapphire: {
-              containerBg: "bg-[#f4f7fc]",
-              borderClass: "border-[#adc5ec]/60",
-              innerBorderClass: "border-[#1d4ed8]/25",
-              labelColor: "text-[#005792]",
-              titleColor: "text-[#0f172a]",
-              ownerLabelBg: "bg-white/85",
-              ownerLabelBorder: "border-[#d0def3]/50",
-              ownerNameText: "text-blue-950",
-              wordColor: "text-[#005792]",
-              wordSubText: "text-[#005792]",
-              certIdBg: "bg-white/70",
-              certIdBorder: "border-[#d8e3f4]/50",
-              certIdText: "text-blue-950",
-              sealBg: "bg-[#fafdff]",
-              sealBorder: "border-[#005792]",
-              sealText: "text-[#005792]",
-              signatureColor: "text-[#005792]",
-              accentBarGradient: "from-blue-400 via-indigo-500 to-blue-600"
-            },
-            ruby: {
-              containerBg: "bg-[#fdf5f5]",
-              borderClass: "border-[#efa9a9]/60",
-              innerBorderClass: "border-[#b91c1c]/25",
-              labelColor: "text-[#991b1b]",
-              titleColor: "text-[#1d1010]",
-              ownerLabelBg: "bg-white/85",
-              ownerLabelBorder: "border-[#f6cfcf]/50",
-              ownerNameText: "text-rose-950",
-              wordColor: "text-[#b91c1c]",
-              wordSubText: "text-[#991b1b]",
-              certIdBg: "bg-white/70",
-              certIdBorder: "border-[#fbdcdb]/50",
-              certIdText: "text-rose-950",
-              sealBg: "bg-[#fffafa]",
-              sealBorder: "border-[#b91c1c]",
-              sealText: "text-[#991b1b]",
-              signatureColor: "text-[#b91c1c]",
-              accentBarGradient: "from-red-400 via-rose-500 to-red-600"
-            }
-          };
-          const styles = themesMap[activeTheme] || themesMap.gold;
-
-          return (
-            <div className={`relative p-6 md:p-8 ${styles.containerBg} border-8 border-double ${styles.borderClass} rounded-[24px] shadow-2xl transition-all duration-300 overflow-hidden select-none max-w-3xl mx-auto text-right`}>
+        <div className={`relative p-6 md:p-8 ${styles.containerBg} border-8 border-double ${styles.borderClass} rounded-[24px] shadow-2xl transition-all duration-300 overflow-hidden select-none max-w-3xl mx-auto text-right`}>
               
               {/* Top aesthetic style accent line bar */}
               <div className={`absolute top-0 inset-x-0 h-1 bg-gradient-to-r ${styles.accentBarGradient}`}></div>
@@ -436,9 +439,152 @@ export default function Certificate({ record, onClose, standalone = false }: Cer
 
               </div>
 
+        </div>
+      </div>
+
+      {/* Hidden Instagram Square Post Container for HQ capturing (1080x1080px ratio) */}
+      {/* Wrapped in a fixed offscreen bounds container to guarantee Chrome's rendering engine computes all text layouts and typography, preventing blank screenshots */}
+      <div 
+        style={{ 
+          position: 'fixed', 
+          top: '200vh', 
+          left: '0px', 
+          width: '1080px', 
+          height: '1080px', 
+          zIndex: -100, 
+          pointerEvents: 'none',
+          overflow: 'hidden'
+        }}
+      >
+        <div 
+          ref={igPostRef}
+          style={{ 
+            width: '1080px', 
+            height: '1080px', 
+            boxSizing: 'border-box'
+          }}
+          className={`${styles.containerBg} flex flex-col justify-between p-14 border-[16px] border-double ${styles.borderClass} text-right select-none font-sans overflow-hidden`}
+        >
+          {/* Top aesthetic style accent line bar */}
+          <div className={`absolute top-0 inset-x-0 h-4 bg-gradient-to-r ${styles.accentBarGradient}`}></div>
+
+          {/* Inner Styled Border Line Frame */}
+          <div className={`absolute inset-6 border-2 ${styles.innerBorderClass} rounded-[20px] pointer-events-none`}></div>
+
+          {/* Corner decorative ornaments for the square card */}
+          <div className={`absolute top-8 right-8 text-xl ${styles.signatureColor} opacity-70`}>✦</div>
+          <div className={`absolute top-8 left-8 text-xl ${styles.signatureColor} opacity-70`}>✦</div>
+          <div className={`absolute bottom-8 right-8 text-xl ${styles.signatureColor} opacity-70`}>✦</div>
+          <div className={`absolute bottom-8 left-8 text-xl ${styles.signatureColor} opacity-70`}>✦</div>
+
+          {/* BRAND HEADER */}
+          <div className="text-center space-y-2 mt-4 font-sans">
+            <div className={`text-sm font-extrabold tracking-widest ${styles.labelColor} uppercase flex items-center justify-center gap-2`}>
+              <span>✦</span>
+              <span>ديوان الحروف العربية الأنيقة</span>
+              <span>✦</span>
             </div>
-          );
-        })()}
+            <h1 className="text-4xl font-black text-neutral-900 font-heading-arabic mt-1">شَهاَدَةُ مِلْكِيّةٍ رَمْزِيّة</h1>
+            <div className="flex items-center justify-center gap-3">
+              <span className="w-16 h-[1.5px] bg-neutral-300/60"></span>
+              <span className={`text-xs font-black ${styles.labelColor}`}>مَنَصَّة كِلْمَتِي ✦ kilmati.com</span>
+              <span className="w-16 h-[1.5px] bg-neutral-300/60"></span>
+            </div>
+          </div>
+
+          {/* CENTER FOCUS: THE WORD & OWNER */}
+          <div className="my-auto text-center space-y-8 py-4">
+            <div className="space-y-3 font-sans">
+              <p className="text-sm tracking-wide text-neutral-500 font-bold font-body-arabic">أُشْهِدَ كَمَا فيِ السِّجِلَّاتِ الرَّقمِيّـةِ لِلْمَنَصَّةِ بِأَنَّ الأَدِيبْ:</p>
+              <div className={`inline-block px-12 py-3.5 ${styles.ownerLabelBg} border-2 ${styles.ownerLabelBorder} rounded-2xl shadow-xs`}>
+                <h2 className={`text-4xl font-black ${styles.ownerNameText} tracking-tight font-heading-arabic`}>
+                  {record.owner}
+                </h2>
+              </div>
+            </div>
+
+            <div className="relative py-4 flex flex-col items-center justify-center font-sans">
+              {/* Elegant watermark */}
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center opacity-10">
+                <span className="text-[150px] font-black tracking-widest font-serif-arabic font-extrabold select-none">كِلْمَتِي</span>
+              </div>
+              
+              <p className="text-xs text-neutral-400 font-black uppercase tracking-widest mb-3 z-10">قَدْ حَازَ الْسِّيَادَةَ الرَّمْزِيَّةَ الْكَامِلَةَ لِلَفْظِ:</p>
+              <div className="z-10 py-1">
+                <h3 className={`text-8xl font-black ${styles.wordColor} tracking-wide leading-none drop-shadow-sm font-serif-arabic`}>
+                  « {record.word} »
+                </h3>
+              </div>
+            </div>
+
+            {/* Meaning / Quote context wrapper */}
+            <div className="max-w-2xl mx-auto space-y-3 bg-[#ffffff]/60 border border-neutral-200/40 rounded-2xl p-5 shadow-xs font-sans">
+              <span className={`text-[10px] font-black uppercase tracking-wider ${styles.labelColor}`}>
+                الجوهر والمعنى البليغ للفظ
+              </span>
+              <p className="text-neutral-800 text-sm font-bold font-body-arabic leading-relaxed text-center px-4">
+                "{record.meaning || 'يجري حالياً الكشف التلقائي عن خلاصة الفصاحة...'}"
+              </p>
+              {record.quote && (
+                <div className="pt-2 border-t border-dashed border-neutral-350/50">
+                  <p className="text-neutral-500 text-xs italic font-medium">✨ "{record.quote}"</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* FOOTER: CERT ID, GOLD SEAL & DIGITAL SIGNATURE */}
+          <div className="grid grid-cols-3 items-end border-t border-dashed border-neutral-300/70 pt-6 mb-2 font-sans">
+            
+            {/* Left Column: Cert ID */}
+            <div className="text-right space-y-2">
+              <div className={`${styles.certIdBg} border ${styles.certIdBorder} rounded-xl px-4 py-2 text-center inline-block shadow-3xs`}>
+                <span className={`block text-[9px] font-black uppercase tracking-wider mb-0.5 ${styles.labelColor}`}>
+                  رقم التوثيق الرقمي
+                </span>
+                <span className="block font-mono text-[10px] font-extrabold tracking-wider text-neutral-700">
+                  OWN-{record.id.toUpperCase().substring(0, 10)}
+                </span>
+              </div>
+              <div className="text-right pr-2">
+                <span className="block text-[10px] font-bold text-neutral-450">تاريخ التوثيق</span>
+                <span className="block text-xs font-bold text-neutral-800">{formatDate(record.createdAt)}</span>
+              </div>
+            </div>
+
+            {/* Center Column: Traditional Gold Seal Stamp */}
+            <div className="flex flex-col items-center justify-center">
+              <div className={`relative flex items-center justify-center w-[100px] h-[100px] rounded-full border-2 ${styles.sealBorder} ${styles.sealBg} shadow-xs`}>
+                <div className={`absolute inset-1 rounded-full border border-dashed ${styles.sealBorder}/80`}></div>
+                <div className={`text-center text-[9px] font-black ${styles.sealText} flex flex-col items-center justify-center leading-none`}>
+                  <span className="text-[10px] scale-90 mb-1 tracking-tight font-heading-arabic">ختم الحروف</span>
+                  <span className="text-[8px] tracking-widest my-0.5">★ ★ ★</span>
+                  <span className="scale-85 text-[9px] font-heading-arabic">مَنَصَّة كِلْمَتِي</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Platform Digital Signature */}
+            <div className="text-left flex flex-col items-end space-y-1">
+              <span className="block text-[10px] font-bold text-neutral-450">التوقيع الرقمي للمنصة</span>
+              <div className="h-10 flex items-center justify-end">
+                <svg className={`w-28 h-9 ${styles.signatureColor}`} viewBox="0 0 100 30" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M10,18 C25,5 35,28 50,12 C60,25 75,5 85,18 C90,22 93,10 95,15" />
+                  <path d="M15,22 Q50,4 85,24" strokeWidth="1" strokeDasharray="2 2" />
+                </svg>
+              </div>
+              <span className="block text-[10px] font-extrabold text-[#8c6b12] font-heading-arabic">ديوان كِلْمَتِي المعتمد</span>
+            </div>
+
+          </div>
+
+          {/* BOTTOM EXPLICIT BRAND watermark: Shows website name clearly */}
+          <div className="absolute bottom-2 inset-x-0 text-center font-sans">
+            <span className="text-[10px] font-black tracking-widest text-[#8c6b12] font-mono uppercase bg-white/95 border border-stone-200 px-5 py-1 rounded-full shadow-3xs">
+              صُنِعَتْ وَثِيقَةُ الْفَخْرِ عَبْرَ: kilmati.com ❁ كِلْمَتِي
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Modern, extremely gorgeous backing information and AI-generated text beneath */}

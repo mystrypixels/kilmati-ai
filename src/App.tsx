@@ -15,6 +15,7 @@ import AIChatCompanion from './components/AIChatCompanion';
 import LinguisticNetwork from './components/LinguisticNetwork';
 import AuthProfile from './components/AuthProfile';
 import TrustSection from './components/TrustSection';
+import MysticOracle from './components/MysticOracle';
 import { classifyArabicWord } from './utils';
 import { Sparkles, MessageCircle, Info, Award, Compass, Search, Gift, ShieldAlert, History, HelpCircle, Flame, DollarSign, CheckCircle, FileText, Mail, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -453,8 +454,16 @@ export default function App() {
 
         </section>
 
+        {/* مِسبار المزاج اللغوي المتكامل */}
+        <section id="mystic-oracle-section" className="pt-8 border-t border-neutral-200/50">
+          <MysticOracle 
+            onSelectWord={startClaimWord}
+            onAskChat={(prompt) => setChatTriggerPrompt(prompt)}
+          />
+        </section>
+
         {/* 3. الكلمات الشائعة وقائمة الاختيار الأكثر طلباً بالديوان (Popular Words checklist) */}
-        <section id="popular-words-checklist" className="pt-8 border-t border-neutral-200/50 space-y-8">
+        <section id="popular-words-checklist" className="pt-8 border-t border-[#dfdfdf]/50 space-y-8">
           
           {/* Popular Words checklist dashboard */}
           <div className="bg-stone-50 border border-neutral-200 rounded-[24px] p-6 md:p-8 space-y-6 text-right shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
